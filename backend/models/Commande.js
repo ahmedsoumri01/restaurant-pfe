@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const commandeSchema = new mongoose.Schema(
   {
     client: { type: mongoose.Schema.Types.ObjectId, ref: "User" },

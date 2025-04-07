@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const avisSchema = new mongoose.Schema(
   {
     client: { type: mongoose.Schema.Types.ObjectId, ref: "User" },

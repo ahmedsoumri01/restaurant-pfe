@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const platSchema = new mongoose.Schema(
   {
     nom: String,

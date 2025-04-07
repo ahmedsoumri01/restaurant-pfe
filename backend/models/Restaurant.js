@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const restaurantSchema = new mongoose.Schema(
   {
     proprietaire: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
