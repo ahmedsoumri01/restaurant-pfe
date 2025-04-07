@@ -56,16 +56,16 @@ export default function Login() {
   // Redirect if user is already authenticated
   if (isAuthenticated) {
     if (user?.role === "admin") {
-      window.location.href = "/dashboard/admin";
+      window.location.href = "/admin";
       return null;
     } else if (user?.role === "livreur") {
-      window.location.href = "/dashboard/livreur";
+      window.location.href = "/livreur";
       return null;
     } else if (user?.role === "restaurant") {
-      window.location.href = "/dashboard/livreur";
+      window.location.href = "/livreur";
       return null;
     } else if (user?.role === "client") {
-      window.location.href = "/dashboard/client";
+      window.location.href = "/client";
       return null;
     }
   }
