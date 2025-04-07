@@ -34,7 +34,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 export default function Login() {
   const router = useRouter();
-  const { login, isLoading } = useAuthStore();
+  const { login, isLoading, isAuthenticated, user } = useAuthStore();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -47,13 +47,28 @@ export default function Login() {
   async function onSubmit(values: FormValues) {
     try {
       const onsucess = await login(values);
-      onsucess && router.push("/dashboard");
+      /*  onsucess && router.push("/dashboard"); */
     } catch (error) {
       // Error is handled in the store
       console.error(error);
     }
   }
-
+  // Redirect if user is already authenticated
+  if (isAuthenticated) {
+    if (user?.role === "admin") {
+      window.location.href = "/dashboard/admin";
+      return null;
+    } else if (user?.role === "livreur") {
+      window.location.href = "/dashboard/livreur";
+      return null;
+    } else if (user?.role === "restaurant") {
+      window.location.href = "/dashboard/livreur";
+      return null;
+    } else if (user?.role === "client") {
+      window.location.href = "/dashboard/client";
+      return null;
+    }
+  }
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#FFF5EB]">
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-sm">
@@ -105,6 +120,7 @@ export default function Login() {
                     <Input
                       type="password"
                       placeholder="••••••••"
+                      showPasswordToggle={true}
                       className="h-12 rounded-md border-gray-300"
                       {...field}
                     />
