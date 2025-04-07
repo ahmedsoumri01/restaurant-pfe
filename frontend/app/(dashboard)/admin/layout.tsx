@@ -1,20 +1,35 @@
 "use client";
 
 import type React from "react";
+
+import { useState } from "react";
 import Header from "@/components/Header";
-import SideBar from "@/components/side-bar/side-bar";
+import SideBar, { adminSidebarConfig } from "@/components/side-bar/side-bar";
+import { cn } from "@/lib/utils";
+
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
   return (
-    <>
-      <Header />
-      <div className="flex h-full w-full">
-        <SideBar />
-        <div className="flex-1 overflow-auto p-2 bg-red-500">{children}</div>
-      </div>
-    </>
+    <div className="min-h-screen bg-gray-50">
+      <Header toggleSidebar={toggleSidebar} isCollapsed={isCollapsed} />
+      <SideBar config={adminSidebarConfig} isCollapsed={isCollapsed} />
+      <main
+        className={cn(
+          "pt-16 transition-all duration-300",
+          isCollapsed ? "ml-[70px]" : "ml-[250px]"
+        )}
+      >
+        <div className="p-6 h-[calc(100vh-4rem)] overflow-auto">{children}</div>
+      </main>
+    </div>
   );
 }
