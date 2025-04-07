@@ -1,5 +1,4 @@
 const nodemailer = require("nodemailer");
- 
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -11,11 +10,10 @@ const transporter = nodemailer.createTransport({
 });
 
 exports.sendResetPasswordMail = async (email, token) => {
-
   console.log({
     email,
-    token
-  })
+    token,
+  });
   const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
 
   const mailOptions = {
@@ -54,7 +52,7 @@ exports.sendResetPasswordMail = async (email, token) => {
   } catch (error) {
     console.error("Erreur lors de l'envoi de l'e-mail:", error);
   }
-}; 
+};
 // Function to send email to admin
 exports.sendEmailToAdmin = async (name, email, phone, subject, message) => {
   const mailOptions = {
@@ -89,11 +87,53 @@ exports.sendEmailToAdmin = async (name, email, phone, subject, message) => {
     `,
   };
 
-
   try {
     await transporter.sendMail(mailOptions);
     console.log("Email envoyé à l'admin avec succès.");
   } catch (error) {
     console.error("Erreur lors de l'envoi de l'e-mail à l'admin:", error);
+  }
+};
+
+//func to send welcome email to the user with his email address and password and his nom , prenom
+
+exports.sendWelcomeEmail = async (nom, prenom, email, password) => {
+  const mailOptions = {
+    from: process.env.NODE_MAILER_EMAIL,
+    to: email,
+    subject: "Bienvenue sur notre site",
+    html: `
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; background-color: #f4f4f4; }
+          .container { max-width: 600px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 8px; }
+          .header { background: #0078d4; color: white; padding: 10px; text-align: center; font-size: 20px; }
+          .content { padding: 20px; text-align: center; }
+          .footer { margin-top: 20px; text-align: center; font-size: 12px; color: #666; }
+        </style>
+      </head>
+      <body>
+      <div class="container">
+      <div class="header">Bienvenue sur notre site</div>
+      <div class="content">
+      <p>Merci de votre inscription sur notre site.</p>
+      <p>Voici vos informations de connexion:</p>
+      <p><strong>Nom:</strong> ${nom + " " + prenom}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Mot de passe:</strong> ${password}</p>
+      <p>Vous pouvez maintenant vous connecter à votre compte.</p>
+      </div>
+      <div class="footer">Cet e-mail a été envoyé automatiquement.</div>
+      </div>
+      </body>
+      </html>
+      `,
+  };
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Email envoyé à  l'utilisateur avec succès.");
+  } catch (error) {
+    console.error("Erreur lors de l'envoi de l'e-mail   :", error);
   }
 };

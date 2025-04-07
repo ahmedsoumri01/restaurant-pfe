@@ -3,6 +3,9 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db.js");
 const path = require("path");
+const authRoutes = require("./routes/auth.routes");
+const { createAdminAccount } = require("./controllers/auth.controller");
+
 // Load environment variables from .env file
 dotenv.config();
 
@@ -20,12 +23,15 @@ app.use(
 
 // Serve static files (profile images)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+//create default admin account
+createAdminAccount();
 
 // Middleware to parse JSON bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+app.use("/api/auth", authRoutes);
 
 // Define a simple route for testing
 app.get("/", (req, res) => {
@@ -33,7 +39,7 @@ app.get("/", (req, res) => {
 });
 
 // Set the port from environment variables or default to 3001
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 // Start the server
 app.listen(PORT, () => {

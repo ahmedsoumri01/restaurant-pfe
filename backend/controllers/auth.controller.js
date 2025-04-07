@@ -4,8 +4,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 require("dotenv").config();
-
-// 🔹 Register User
+const { sendWelcomeEmail } = require("../middlewares/mailSender");
+// 🔹 Register User (worked)
 exports.register = async (req, res) => {
   const { nom, prenom, email, motDePasse, telephone, adresse, role } = req.body;
   try {
@@ -24,11 +24,11 @@ exports.register = async (req, res) => {
       adresse,
       motDePasse: hashedPassword,
       telephone,
-      role,
+      role: "client",
     });
 
     await user.save();
-
+    await sendWelcomeEmail(nom, prenom, email, motDePasse); // Send welcome email
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "7d",
     });
@@ -41,7 +41,7 @@ exports.register = async (req, res) => {
   }
 };
 
-// 🔹 Login User
+// 🔹 Login User (worked)
 exports.login = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -81,7 +81,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// 🔹 createAdminAccount
+// 🔹 createAdminAccount (worked)
 exports.createAdminAccount = async () => {
   try {
     // Check if admin already exists
@@ -116,7 +116,7 @@ exports.createAdminAccount = async () => {
   }
 };
 
-// 🔹 Protected Route Example
+// 🔹 Protected Route Example (worked)
 exports.protectedRoute = async (req, res) => {
   res.json({ message: "Welcome to the protected route", user: req.user });
 };
