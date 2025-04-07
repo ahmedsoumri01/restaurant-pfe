@@ -7,7 +7,7 @@ require("dotenv").config();
 const { sendWelcomeEmail } = require("../middlewares/mailSender");
 // 🔹 Register User (worked)
 exports.register = async (req, res) => {
-  const { nom, prenom, email, motDePasse, telephone, adresse, role } = req.body;
+  const { nom, prenom, email, motDePasse, telephone, adresse } = req.body;
   try {
     let user = await User.findOne({ email });
     if (user) {
