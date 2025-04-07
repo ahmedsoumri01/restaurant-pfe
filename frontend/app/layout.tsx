@@ -3,7 +3,6 @@ import type { Metadata } from "next";
  */ import "./globals.css";
 import AOSInit from "@/utils/Aos";
 import { Toaster } from "@/components/ui/sonner";
-import ScrollToTop from "@/components/ScrollToTop";
 
 /* const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,11 +29,11 @@ export default function RootLayout({
       <body
       /*   className={`${geistSans.variable} ${geistMono.variable} antialiased`} */
       >
+        <Toaster />
+
         <AOSInit />
 
         {children}
-        <Toaster />
-        <ScrollToTop />
       </body>
     </html>
   );

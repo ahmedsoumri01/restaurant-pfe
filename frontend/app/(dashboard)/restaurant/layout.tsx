@@ -4,9 +4,12 @@ import type React from "react";
 
 import { useState } from "react";
 import Header from "@/components/Header";
-import SideBar, { adminSidebarConfig } from "@/components/side-bar/side-bar";
+import SideBar, {
+  restaurantSidebarConfig,
+} from "@/components/side-bar/side-bar";
 import { cn } from "@/lib/utils";
-export default function AdminLayout({
+
+export default function RestaurantLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -20,7 +23,7 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen bg-gray-50">
       <Header toggleSidebar={toggleSidebar} isCollapsed={isCollapsed} />
-      <SideBar config={adminSidebarConfig} isCollapsed={isCollapsed} />
+      <SideBar config={restaurantSidebarConfig} isCollapsed={isCollapsed} />
       <main
         className={cn(
           "pt-16 transition-all duration-300",
