@@ -2,13 +2,13 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { toast } from "sonner";
 import api from "@/app/api/axios";
-import { AxiosError } from "axios";
+import type { AxiosError } from "axios";
 
 // Define User interface based on the mongoose schema
 interface User {
   _id: string;
-  nom: string;
-  prenom: string;
+  nom?: string;
+  prenom?: string;
   email: string;
   telephone: string;
   adresse: string;
@@ -47,8 +47,8 @@ interface AuthState {
   isFetching: boolean;
 
   // Actions
-  register: (data: RegisterData) => Promise<Boolean>;
-  login: (data: LoginData) => Promise<Boolean>;
+  register: (data: RegisterData) => Promise<boolean>;
+  login: (data: LoginData) => Promise<boolean>;
   logout: () => Promise<void>;
   getLoggedUser: () => Promise<void>;
   clearError: () => void;
@@ -123,8 +123,10 @@ const useAuthStore = create<AuthState>()(
         logout: async () => {
           set({ isLoading: true });
           try {
-            await api.post("/logout");
+            // The token will be added by the axios interceptor
+            await api.post("/auth/logout");
 
+            // Clear auth state after successful logout
             set({
               user: null,
               token: null,
@@ -137,7 +139,18 @@ const useAuthStore = create<AuthState>()(
             const axiosError = error as AxiosError<{ message: string }>;
             const errorMessage =
               axiosError.response?.data?.message || "Logout failed";
-            set({ error: errorMessage, isLoading: false });
+
+            console.error("Logout error:", error);
+
+            // Even if the server request fails, clear the local auth state
+            set({
+              user: null,
+              token: null,
+              isAuthenticated: false,
+              isLoading: false,
+              error: errorMessage,
+            });
+
             toast.error(errorMessage);
           }
         },

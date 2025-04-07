@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useState } from "react";
-import Header from "@/components/Header";
+import Header from "@/components/header/Header";
 import SideBar, {
   restaurantSidebarConfig,
 } from "@/components/side-bar/side-bar";

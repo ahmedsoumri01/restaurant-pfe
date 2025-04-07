@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useState } from "react";
-import Header from "@/components/Header";
+import Header from "@/components/header/Header";
 import SideBar, { adminSidebarConfig } from "@/components/side-bar/side-bar";
 import { cn } from "@/lib/utils";
 export default function AdminLayout({
