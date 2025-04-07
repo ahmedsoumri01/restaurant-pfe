@@ -3,6 +3,7 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -18,12 +19,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import useAuthStore from "@/store/useAuthStore";
 
 const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address",
   }),
-  password: z.string().min(1, {
+  motDePasse: z.string().min(1, {
     message: "Password is required",
   }),
 });
@@ -31,37 +33,24 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function Login() {
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { login, isLoading } = useAuthStore();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      password: "",
+      motDePasse: "",
     },
   });
 
   async function onSubmit(values: FormValues) {
-    setIsLoading(true);
     try {
-      // Here you would typically make an API call to authenticate the user
-      // For example:
-      // const response = await fetch('/api/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(values),
-      // });
-      //
-      // if (!response.ok) throw new Error('Login failed');
-
-      toast.success("Login successful!");
-      // Redirect to dashboard
-      // router.push('/dashboard');
+      const onsucess = await login(values);
+      onsucess && router.push("/dashboard");
     } catch (error) {
-      toast.error("Login failed");
+      // Error is handled in the store
       console.error(error);
-    } finally {
-      setIsLoading(false);
     }
   }
 
@@ -91,7 +80,7 @@ export default function Login() {
                 <FormItem>
                   <FormLabel className="text-[#777777] font-bold">
                     Email
-                  </FormLabel>
+                  </FormLabel>{" "}
                   <FormControl>
                     <Input
                       placeholder="hello@example.com"
@@ -106,12 +95,12 @@ export default function Login() {
 
             <FormField
               control={form.control}
-              name="password"
+              name="motDePasse"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-[#777777] font-bold">
                     Password
-                  </FormLabel>
+                  </FormLabel>{" "}
                   <FormControl>
                     <Input
                       type="password"
@@ -136,7 +125,10 @@ export default function Login() {
             <div className="text-center mt-4">
               <p className="text-gray-500 text-sm">
                 Don't have an account?{" "}
-                <Link href="/" className="text-[#FF8A2B] hover:underline">
+                <Link
+                  href="/register"
+                  className="text-[#FF8A2B] hover:underline"
+                >
                   Sign up
                 </Link>
               </p>

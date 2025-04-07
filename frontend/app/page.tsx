@@ -6,6 +6,7 @@ import logo from "@/public/logo.png";
 import { toast } from "sonner";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -19,9 +20,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import useAuthStore from "@/store/useAuthStore";
 
-export default function Home() {
-  const [isLoading, setIsLoading] = useState(false);
+export default function Register() {
+  const router = useRouter();
+  const { register, isLoading } = useAuthStore();
 
   const formSchema = z.object({
     nom: z.string().min(1, {
@@ -34,7 +37,7 @@ export default function Home() {
       message: "Email invalide",
     }),
     motDePasse: z.string().min(6, {
-      message: "Mot de passe requis",
+      message: "Mot de passe doit contenir au moins 6 caractères",
     }),
     telephone: z.string().min(1, {
       message: "Téléphone requis",
@@ -57,23 +60,20 @@ export default function Home() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true);
     try {
-      toast.success("Compte créé avec succès!");
-      // Redirect to login or dashboard
-      // router.push('/login');
+      console.log({ values });
+      const onsucess = await register(values);
+      onsucess && router.push("/login");
     } catch (error) {
-      toast.error("L'inscription a échoué");
+      // Error is handled in the store
       console.error(error);
-    } finally {
-      setIsLoading(false);
     }
   }
 
   return (
     <>
-      <div className="flex items-center justify-around min-h-screen p-6 px-12">
-        <div className="w-3/5">
+      <div className="flex items-center gap-4 justify-around min-h-screen p-6 px-12">
+        <div className="hidden md:w-3/5 md:block">
           <Image
             src={login || "/placeholder.svg"}
             alt="login"
@@ -82,7 +82,7 @@ export default function Home() {
             className="rounded-lg  object-cover"
           />
         </div>
-        <div className="w-2/5 ">
+        <div className="w-full md:w-2/5">
           <div className="flex justify-center">
             <Image
               src={logo || "/placeholder.svg"}
@@ -212,7 +212,7 @@ export default function Home() {
               <Button
                 type="submit"
                 variant={"signUpButton"}
-                className={`w-full mt-6 h-12`}
+                className={`w-full mt-6 h-12 cursor-pointer font-bold hover:bg-[#fc943fa9] text-white rounded-md`}
                 disabled={isLoading}
               >
                 {isLoading ? "Création en cours..." : "Créer un compte"}
@@ -223,7 +223,7 @@ export default function Home() {
                   Vous avez déjà un compte?{" "}
                   <Link
                     href="/login"
-                    className="text-[#fc953f] hover:underline"
+                    className="text-[#fc953f] cursor-pointer hover:underline"
                   >
                     Connectez-vous
                   </Link>

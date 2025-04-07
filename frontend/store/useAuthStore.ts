@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { toast } from "sonner";
 import api from "@/app/api/axios";
+import { AxiosError } from "axios";
 
 // Define User interface based on the mongoose schema
 interface User {
@@ -46,8 +47,8 @@ interface AuthState {
   isFetching: boolean;
 
   // Actions
-  register: (data: RegisterData) => Promise<void>;
-  login: (data: LoginData) => Promise<void>;
+  register: (data: RegisterData) => Promise<Boolean>;
+  login: (data: LoginData) => Promise<Boolean>;
   logout: () => Promise<void>;
   getLoggedUser: () => Promise<void>;
   clearError: () => void;
@@ -67,13 +68,11 @@ const useAuthStore = create<AuthState>()(
 
         // Register a new user
         register: async (data: RegisterData) => {
+          console.log("Registering user:", data);
           set({ isLoading: true, error: null });
           try {
-            const response = await api.post("/register", data);
+            const response = await api.post("/auth/register", data);
             const { token, user } = response.data;
-
-            // Set token in axios headers for future requests
-            api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
             set({
               user,
@@ -81,13 +80,16 @@ const useAuthStore = create<AuthState>()(
               isAuthenticated: true,
               isLoading: false,
             });
-
+            console.log("Registration response:", response.data);
             toast.success("Registration successful!");
-          } catch (error: any) {
+            return true;
+          } catch (error) {
+            const axiosError = error as AxiosError<{ message: string }>;
             const errorMessage =
-              error.response?.data?.message || "Registration failed";
+              axiosError.response?.data?.message || "Registration failed";
             set({ error: errorMessage, isLoading: false });
             toast.error(errorMessage);
+            return false;
           }
         },
 
@@ -95,11 +97,8 @@ const useAuthStore = create<AuthState>()(
         login: async (data: LoginData) => {
           set({ isLoading: true, error: null });
           try {
-            const response = await api.post("/login", data);
+            const response = await api.post("/auth/login", data);
             const { token, user } = response.data;
-
-            // Set token in axios headers for future requests
-            api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
             set({
               user,
@@ -109,11 +108,14 @@ const useAuthStore = create<AuthState>()(
             });
 
             toast.success("Login successful!");
-          } catch (error: any) {
+            return true;
+          } catch (error) {
+            const axiosError = error as AxiosError<{ message: string }>;
             const errorMessage =
-              error.response?.data?.message || "Login failed";
+              axiosError.response?.data?.message || "Login failed";
             set({ error: errorMessage, isLoading: false });
             toast.error(errorMessage);
+            return false;
           }
         },
 
@@ -123,9 +125,6 @@ const useAuthStore = create<AuthState>()(
           try {
             await api.post("/logout");
 
-            // Remove token from axios headers
-            delete api.defaults.headers.common["Authorization"];
-
             set({
               user: null,
               token: null,
@@ -134,9 +133,10 @@ const useAuthStore = create<AuthState>()(
             });
 
             toast.success("Logout successful!");
-          } catch (error: any) {
+          } catch (error) {
+            const axiosError = error as AxiosError<{ message: string }>;
             const errorMessage =
-              error.response?.data?.message || "Logout failed";
+              axiosError.response?.data?.message || "Logout failed";
             set({ error: errorMessage, isLoading: false });
             toast.error(errorMessage);
           }
@@ -144,29 +144,27 @@ const useAuthStore = create<AuthState>()(
 
         // Get logged in user data based on role
         getLoggedUser: async () => {
-          const { token, user } = get();
-          if (!token) return;
+          const { user } = get();
+          if (!user) return;
 
           set({ isFetching: true });
           try {
-            // Set token in axios headers
-            api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
             // Determine endpoint based on user role
             const role = user?.role || "client"; // Default to client if no role
-            const response = await api.get(`/me/${role}`);
+            const response = await api.get(`/auth/me/${role}`);
 
             set({
               user: response.data.data.user,
               isFetching: false,
               isAuthenticated: true,
             });
-          } catch (error: any) {
+          } catch (error) {
+            const axiosError = error as AxiosError<{ message: string }>;
             const errorMessage =
-              error.response?.data?.message || "Failed to fetch user data";
+              axiosError.response?.data?.message || "Failed to fetch user data";
 
             // If unauthorized, clear user data
-            if (error.response?.status === 401) {
+            if (axiosError.response?.status === 401) {
               set({
                 user: null,
                 token: null,
