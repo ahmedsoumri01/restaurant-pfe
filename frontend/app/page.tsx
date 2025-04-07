@@ -1,103 +1,238 @@
+"use client";
+
 import Image from "next/image";
+import login from "@/public/login.jpg";
+import logo from "@/public/logo.png";
+import { toast } from "sonner";
+import { useState } from "react";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [isLoading, setIsLoading] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const formSchema = z.object({
+    nom: z.string().min(1, {
+      message: "Nom requis",
+    }),
+    prenom: z.string().min(1, {
+      message: "Prénom requis",
+    }),
+    email: z.string().email({
+      message: "Email invalide",
+    }),
+    motDePasse: z.string().min(6, {
+      message: "Mot de passe requis",
+    }),
+    telephone: z.string().min(1, {
+      message: "Téléphone requis",
+    }),
+    adresse: z.string().min(1, {
+      message: "Adresse requise",
+    }),
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      nom: "",
+      prenom: "",
+      email: "",
+      motDePasse: "",
+      telephone: "",
+      adresse: "",
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      toast.success("Compte créé avec succès!");
+      // Redirect to login or dashboard
+      // router.push('/login');
+    } catch (error) {
+      toast.error("L'inscription a échoué");
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    <>
+      <div className="flex items-center justify-around min-h-screen p-6 px-12">
+        <div className="w-3/5">
+          <Image
+            src={login || "/placeholder.svg"}
+            alt="login"
+            width={800}
+            height={500}
+            className="rounded-lg  object-cover"
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        <div className="w-2/5 ">
+          <div className="flex justify-center">
+            <Image
+              src={logo || "/placeholder.svg"}
+              alt="logo"
+              width={150}
+              height={100}
+              className=""
+            />
+          </div>
+          <h1 className="text-2xl font-black text-center mb-6">
+            Create an Account
+          </h1>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="nom"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#777777] font-bold">
+                      Nom *
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Entrez votre nom"
+                        className="h-10 !ring-[#fc953f] "
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="prenom"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#777777] font-bold">
+                      Prénom *
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="Entrez votre prénom" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#777777] font-bold">
+                      Email *
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="exemple@email.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="motDePasse"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#777777] font-bold">
+                      Mot de passe *
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        showPasswordToggle={true}
+                        type="password"
+                        placeholder="******"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="telephone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#777777] font-bold">
+                      Téléphone *
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Entrez votre numéro de téléphone"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="adresse"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#777777] font-bold">
+                      Adresse *
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder="Entrez votre adresse" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button
+                type="submit"
+                variant={"signUpButton"}
+                className={`w-full mt-6 h-12`}
+                disabled={isLoading}
+              >
+                {isLoading ? "Création en cours..." : "Créer un compte"}
+              </Button>
+
+              <div className="text-center">
+                <p className="text-[#828282]">
+                  Vous avez déjà un compte?{" "}
+                  <Link
+                    href="/login"
+                    className="text-[#fc953f] hover:underline"
+                  >
+                    Connectez-vous
+                  </Link>
+                </p>
+              </div>
+            </form>
+          </Form>
+        </div>
+      </div>
+    </>
   );
 }
