@@ -16,11 +16,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Lock } from "lucide-react";
+import { Lock, Loader2 } from "lucide-react";
+import useAuthStore from "@/store/useAuthStore";
 
 export function ChangePasswordModal() {
   const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const { changePassword, isLoading, user } = useAuthStore();
 
   const [formData, setFormData] = useState({
     currentPassword: "",
@@ -41,20 +42,28 @@ export function ChangePasswordModal() {
       return;
     }
 
-    setIsLoading(true);
+    if (!user?._id) {
+      toast.error("Utilisateur non identifié");
+      return;
+    }
+    console.log("Submitting password change:", formData);
+    try {
+      await changePassword(user._id, {
+        oldPassword: formData.currentPassword,
+        newPassword: formData.newPassword,
+      });
 
-    // This is a placeholder for the actual API call
-    // You would need to implement this in your admin store
-    setTimeout(() => {
-      setIsLoading(false);
-      setOpen(false);
-      toast.success("Mot de passe modifié avec succès");
+      // Reset form and close modal on success
       setFormData({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
-    }, 1000);
+      setOpen(false);
+    } catch (error) {
+      // Error is already handled in the changePassword function
+      console.error("Error in password change:", error);
+    }
   };
 
   return (
@@ -95,6 +104,7 @@ export function ChangePasswordModal() {
                 value={formData.newPassword}
                 onChange={handleChange}
                 required
+                minLength={6}
               />
             </div>
 
@@ -119,7 +129,14 @@ export function ChangePasswordModal() {
               Annuler
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Mise à jour..." : "Enregistrer"}
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Mise à jour...
+                </>
+              ) : (
+                "Enregistrer"
+              )}
             </Button>
           </DialogFooter>
         </form>

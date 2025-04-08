@@ -53,6 +53,10 @@ interface AuthState {
   getLoggedUser: () => Promise<void>;
   clearError: () => void;
   setUser: (user: User | null) => void;
+  changePassword: (
+    userId: string,
+    passwords: { oldPassword: string; newPassword: string }
+  ) => Promise<void>;
 }
 
 const useAuthStore = create<AuthState>()(
@@ -155,6 +159,19 @@ const useAuthStore = create<AuthState>()(
           }
         },
 
+        changePassword: async (userId, passwords) => {
+          set({ isLoading: true });
+          try {
+            await api.put(`/auth/change-password/`, passwords);
+            toast.success("Password updated successfully");
+          } catch (error: any) {
+            toast.error(
+              error?.response?.data?.message || "Failed to change password"
+            );
+          } finally {
+            set({ isLoading: false });
+          }
+        },
         // Get logged in user data based on role
         getLoggedUser: async () => {
           const { user } = get();

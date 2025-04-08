@@ -61,6 +61,7 @@ interface AdminState {
   getAllUsers: () => Promise<User[]>;
   changeAccountStatus: (data: AccountStatusUpdate) => Promise<boolean>;
   createRestaurantOwner: (data: RestaurantOwnerData) => Promise<boolean>;
+  deleteUser: (userId: string) => Promise<boolean>;
 
   // Utility Actions
   clearError: () => void;
@@ -202,6 +203,34 @@ const useAdminStore = create<AdminState>()(
         const errorMessage =
           axiosError.response?.data?.message ||
           "Failed to create restaurant owner";
+
+        set({ error: errorMessage, isLoading: false });
+        toast.error(errorMessage);
+        return false;
+      }
+    },
+
+    // Delete User
+    deleteUser: async (userId: string) => {
+      set({ isLoading: true, error: null });
+      try {
+        await api.delete(`/admin/users/${userId}`);
+
+        // Remove the deleted user from the users array
+        const { users } = get();
+        const updatedUsers = users.filter((user) => user._id !== userId);
+
+        set({
+          users: updatedUsers,
+          isLoading: false,
+        });
+
+        toast.success("User deleted successfully");
+        return true;
+      } catch (error) {
+        const axiosError = error as AxiosError<{ message: string }>;
+        const errorMessage =
+          axiosError.response?.data?.message || "Failed to delete user";
 
         set({ error: errorMessage, isLoading: false });
         toast.error(errorMessage);

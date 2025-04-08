@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,6 +31,7 @@ import {
   ArrowDown,
   Loader2,
   Filter,
+  Trash2,
 } from "lucide-react";
 import useAdminStore from "@/store/useAdminStore";
 import useAuthStore from "@/store/useAuthStore";
@@ -43,6 +45,16 @@ import {
 import { CreateRestaurantOwner } from "@/app/(dashboard)/admin/restaurant-management/create-restaurant-owner";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 // Define the User interface
 interface User {
@@ -62,7 +74,7 @@ type SortField = "nom" | "prenom" | "role" | "statut";
 type SortDirection = "asc" | "desc";
 
 export default function UserManagement() {
-  const { users, getAllUsers, changeAccountStatus, isLoading } =
+  const { users, getAllUsers, changeAccountStatus, deleteUser, isLoading } =
     useAdminStore();
   const { user: loggedUser } = useAuthStore();
 
@@ -72,6 +84,9 @@ export default function UserManagement() {
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     getAllUsers();
@@ -123,6 +138,24 @@ export default function UserManagement() {
     newStatus: "pending" | "active" | "blocked"
   ) => {
     await changeAccountStatus({ userId, statut: newStatus });
+  };
+
+  const handleDeleteClick = (user: User) => {
+    setUserToDelete(user);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!userToDelete) return;
+
+    setIsDeleting(true);
+    const success = await deleteUser(userToDelete._id);
+    setIsDeleting(false);
+
+    if (success) {
+      setIsDeleteDialogOpen(false);
+      setUserToDelete(null);
+    }
   };
 
   const handleSort = (field: SortField) => {
@@ -366,6 +399,14 @@ export default function UserManagement() {
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                            onClick={() => handleDeleteClick(user)}
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete User
+                          </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     )}
@@ -399,6 +440,42 @@ export default function UserManagement() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Delete User Confirmation Dialog */}
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm User Deletion</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {userToDelete?.prenom}{" "}
+              {userToDelete?.nom}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
