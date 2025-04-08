@@ -5,6 +5,7 @@ const connectDB = require("./config/db.js");
 const path = require("path");
 const authRoutes = require("./routes/auth.routes");
 const adminRoutes = require("./routes/admin.routes");
+const restaurantRoutes = require("./routes/restaurant.routes");
 const { createAdminAccount } = require("./controllers/auth.controller");
 
 // Load environment variables from .env file
@@ -34,6 +35,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/restaurant", restaurantRoutes);
 
 // Define a simple route for testing
 app.get("/", (req, res) => {
