@@ -36,12 +36,12 @@ export const adminSidebarConfig: SidebarConfig = {
     },
     {
       title: "Gérer tous les utilisateurs",
-      path: "/admin/users",
+      path: "/admin/user-management",
       icon: Users,
       submenu: [
         {
           title: "All utilisateurs",
-          path: "/admin/users/all",
+          path: "/admin/user-management",
           icon: Users,
         },
       ],

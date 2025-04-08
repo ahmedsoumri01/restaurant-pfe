@@ -25,7 +25,7 @@ router.get("/users", authMiddleware, adminMiddleware, getAllUsers);
 
 // 🔹 Change Account Status
 router.put(
-  "/users/:id/status",
+  "/users/status",
   authMiddleware,
   adminMiddleware,
   changeAccountStatus

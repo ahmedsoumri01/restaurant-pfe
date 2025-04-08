@@ -151,8 +151,9 @@ const useAdminStore = create<AdminState>()(
     changeAccountStatus: async (data: AccountStatusUpdate) => {
       set({ isLoading: true, error: null });
       try {
-        const response = await api.put(`/admin/users/${data.userId}/status`, {
+        const response = await api.put(`/admin/users/status`, {
           statut: data.statut,
+          userId: data.userId,
         });
         const { user } = response.data;
 

@@ -63,8 +63,9 @@ exports.getAllUsers = async (req, res) => {
 // 🔹 Change Account Status
 exports.changeAccountStatus = async (req, res) => {
   try {
-    const { userId, statut } = req.body;
+    const { statut, userId } = req.body;
 
+    console.log(userId, statut);
     // Validate the status value
     const validStatuses = ["pending", "active", "blocked"];
     if (!validStatuses.includes(statut)) {
@@ -119,12 +120,10 @@ exports.createRestaurantOwner = async (req, res) => {
 
     await restaurantOwner.save();
 
-    res
-      .status(201)
-      .json({
-        message: "Restaurant owner created successfully",
-        restaurantOwner,
-      });
+    res.status(201).json({
+      message: "Restaurant owner created successfully",
+      restaurantOwner,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
