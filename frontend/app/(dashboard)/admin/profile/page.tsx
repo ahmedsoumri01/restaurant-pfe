@@ -1,149 +1,131 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useAdminStore from "@/store/useAdminStore";
-import { toast } from "sonner";
+import { ProfileCard } from "@/components/admin/profile-card";
+import { UpdateProfileModal } from "@/components/admin/update-profile-modal";
+import { ChangePasswordModal } from "@/components/admin/change-password-modal";
+import { AdminProfileSkeleton } from "@/components/admin/admin-profile-skeleton";
 
 export default function AdminProfile() {
-  const { adminProfile, getAdminProfile, updateAdminProfile, isLoading } =
-    useAdminStore();
-
-  const [formData, setFormData] = useState({
-    nom: "",
-    prenom: "",
-    email: "",
-    telephone: "",
-    adresse: "",
-    photoProfil: "",
-  });
+  const { adminProfile, getAdminProfile, isLoading, error } = useAdminStore();
 
   useEffect(() => {
     getAdminProfile();
   }, [getAdminProfile]);
 
-  useEffect(() => {
-    if (adminProfile) {
-      setFormData({
-        nom: adminProfile.nom || "",
-        prenom: adminProfile.prenom || "",
-        email: adminProfile.email || "",
-        telephone: adminProfile.telephone || "",
-        adresse: adminProfile.adresse || "",
-        photoProfil: adminProfile.photoProfil || "",
-      });
-    }
-  }, [adminProfile]);
+  if (isLoading && !adminProfile) {
+    return <AdminProfileSkeleton />;
+  }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const success = await updateAdminProfile(formData);
-    if (success) {
-      toast.success("Profile updated successfully");
-    }
-  };
-
-  const getInitials = () => {
-    if (!adminProfile) return "AD";
-    return `${adminProfile.nom?.charAt(0) || ""}${
-      adminProfile.prenom?.charAt(0) || ""
-    }`;
-  };
+  if (error || !adminProfile) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <Card className="w-full max-w-3xl mx-auto">
+          <CardHeader>
+            <CardTitle>Erreur</CardTitle>
+            <CardDescription>
+              {error ||
+                "Impossible de charger le profil. Veuillez vous reconnecter."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => (window.location.href = "/login")}>
+              Se connecter
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader className="flex flex-row items-center gap-4">
-        <Avatar className="h-16 w-16">
-          <AvatarImage src={adminProfile?.photoProfil || ""} alt="Admin" />
-          <AvatarFallback>{getInitials()}</AvatarFallback>
-        </Avatar>
-        <CardTitle>Admin Profile</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="nom">Last Name</Label>
-              <Input
-                id="nom"
-                name="nom"
-                value={formData.nom}
-                onChange={handleChange}
-                placeholder="Last Name"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="prenom">First Name</Label>
-              <Input
-                id="prenom"
-                name="prenom"
-                value={formData.prenom}
-                onChange={handleChange}
-                placeholder="First Name"
-              />
-            </div>
-          </div>
+    <div className="w-full p-4">
+      <h1 className="text-3xl font-bold mb-8">Mon Profil</h1>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Email"
-            />
-          </div>
+      <div className="grid grid-cols-1 gap-8 w-full">
+        <ProfileCard user={adminProfile} />
 
-          <div className="space-y-2">
-            <Label htmlFor="telephone">Phone Number</Label>
-            <Input
-              id="telephone"
-              name="telephone"
-              value={formData.telephone}
-              onChange={handleChange}
-              placeholder="Phone Number"
-            />
-          </div>
+        <Tabs defaultValue="account" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="account">Informations personnelles</TabsTrigger>
+            <TabsTrigger value="security">Sécurité</TabsTrigger>
+          </TabsList>
 
-          <div className="space-y-2">
-            <Label htmlFor="adresse">Address</Label>
-            <Input
-              id="adresse"
-              name="adresse"
-              value={formData.adresse}
-              onChange={handleChange}
-              placeholder="Address"
-            />
-          </div>
+          <TabsContent value="account">
+            <Card>
+              <CardHeader>
+                <CardTitle>Informations personnelles</CardTitle>
+                <CardDescription>
+                  Consultez et modifiez vos informations personnelles.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h3 className="text-sm font-medium mb-1">Prénom</h3>
+                    <p className="text-gray-700">
+                      {adminProfile.prenom || "Non renseigné"}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium mb-1">Nom</h3>
+                    <p className="text-gray-700">
+                      {adminProfile.nom || "Non renseigné"}
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium mb-1">Email</h3>
+                    <p className="text-gray-700">{adminProfile.email}</p>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium mb-1">Téléphone</h3>
+                    <p className="text-gray-700">
+                      {adminProfile.telephone || "Non renseigné"}
+                    </p>
+                  </div>
+                </div>
+                <div className="pt-4">
+                  <UpdateProfileModal
+                    user={adminProfile}
+                    onProfileUpdated={() => getAdminProfile()}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-          <div className="space-y-2">
-            <Label htmlFor="photoProfil">Profile Photo URL</Label>
-            <Input
-              id="photoProfil"
-              name="photoProfil"
-              value={formData.photoProfil}
-              onChange={handleChange}
-              placeholder="Profile Photo URL"
-            />
-          </div>
+          <TabsContent value="security">
+            <Card>
+              <CardHeader>
+                <CardTitle>Sécurité</CardTitle>
+                <CardDescription>
+                  Gérez la sécurité de votre compte.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <h3 className="text-sm font-medium mb-1">Mot de passe</h3>
+                  <p className="text-gray-700">••••••••</p>
+                </div>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Updating..." : "Update Profile"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+                <div className="pt-4">
+                  <ChangePasswordModal />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
   );
 }
