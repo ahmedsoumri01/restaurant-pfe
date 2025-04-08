@@ -21,8 +21,11 @@ interface ProfileCardProps {
 
 export function ProfileCard({ user }: ProfileCardProps) {
   const getInitials = () => {
-    return `${user.nom?.charAt(0) || ""}${user.prenom?.charAt(0) || ""}`;
+    const firstInitial = user.prenom ? user.prenom[0] : "";
+    const lastInitial = user.nom ? user.nom[0] : "";
+    return `${firstInitial}${lastInitial}`;
   };
+  console.log("http://localhost:3001" + user.photoProfil);
 
   return (
     <Card className="overflow-hidden">
@@ -31,9 +34,13 @@ export function ProfileCard({ user }: ProfileCardProps) {
         <div className="flex flex-col items-center -mt-16">
           <Avatar className="h-32 w-32 border-4 border-white bg-white">
             <AvatarImage
-              src={user.photoProfil || ""}
-              alt={`${user.prenom} ${user.nom}`}
+              src={
+                process.env.NEXT_PUBLIC_APP_URL +
+                (user.photoProfil ?? "/default-profile.png")
+              }
+              alt="Profile"
             />
+
             <AvatarFallback className="text-2xl">
               {getInitials()}
             </AvatarFallback>

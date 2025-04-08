@@ -55,12 +55,14 @@ interface AdminState {
 
   // Admin Profile Actions
   getAdminProfile: () => Promise<User | null>;
-  updateAdminProfile: (data: AdminProfileUpdate) => Promise<boolean>;
+  updateAdminProfile: (data: AdminProfileUpdate | FormData) => Promise<boolean>;
 
   // User Management Actions
   getAllUsers: () => Promise<User[]>;
   changeAccountStatus: (data: AccountStatusUpdate) => Promise<boolean>;
-  createRestaurantOwner: (data: RestaurantOwnerData) => Promise<boolean>;
+  createRestaurantOwner: (
+    data: RestaurantOwnerData | FormData
+  ) => Promise<boolean>;
   deleteUser: (userId: string) => Promise<boolean>;
 
   // Utility Actions
@@ -99,10 +101,18 @@ const useAdminStore = create<AdminState>()(
     },
 
     // Update Admin Profile
-    updateAdminProfile: async (data: AdminProfileUpdate) => {
+    updateAdminProfile: async (data: AdminProfileUpdate | FormData) => {
       set({ isLoading: true, error: null });
       try {
-        const response = await api.put("/admin/profile", data);
+        // Check if data is FormData for multipart/form-data request (with image)
+        const isFormData = data instanceof FormData;
+
+        // Configure request headers based on data type
+        const config = isFormData
+          ? { headers: { "Content-Type": "multipart/form-data" } }
+          : undefined;
+
+        const response = await api.put("/admin/profile", data, config);
         const { admin } = response.data;
 
         set({
@@ -182,10 +192,22 @@ const useAdminStore = create<AdminState>()(
     },
 
     // Create Restaurant Owner
-    createRestaurantOwner: async (data: RestaurantOwnerData) => {
+    createRestaurantOwner: async (data: RestaurantOwnerData | FormData) => {
       set({ isLoading: true, error: null });
       try {
-        const response = await api.post("/admin/restaurant-owner", data);
+        // Check if data is FormData for multipart/form-data request (with image)
+        const isFormData = data instanceof FormData;
+
+        // Configure request headers based on data type
+        const config = isFormData
+          ? { headers: { "Content-Type": "multipart/form-data" } }
+          : undefined;
+
+        const response = await api.post(
+          "/admin/restaurant-owner",
+          data,
+          config
+        );
         const { restaurantOwner } = response.data;
 
         // Add the new restaurant owner to the users array
