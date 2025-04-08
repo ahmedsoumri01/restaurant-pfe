@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 type Props = {};
 import useAuthStore from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
-
+import Link from "next/link";
 export default function UserDropdown({}: Props) {
   const { user, isAuthenticated, logout } = useAuthStore();
   const router = useRouter();
@@ -64,14 +64,18 @@ export default function UserDropdown({}: Props) {
             </div>
           </div>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className="cursor-pointer duration-300 transition-all ease-in-out hover:bg-orange-500 hover:text-white group">
-            <User className="mr-2 h-4 w-4 duration-300 transition-all ease-in-out hover:bg-orange-500 hover:text-white group" />
-            <span>Profile</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer duration-300 transition-all ease-in-out hover:bg-orange-500 hover:text-white group">
-            <Settings className="mr-2 h-4 w-4 duration-300 transition-all ease-in-out hover:bg-orange-500 hover:text-white group" />
-            <span>Settings</span>
-          </DropdownMenuItem>
+          <Link href={`/${user?.role}/profile`}>
+            <DropdownMenuItem className="cursor-pointer duration-300 transition-all ease-in-out hover:bg-orange-500 hover:text-white group">
+              <User className="mr-2 h-4 w-4 duration-300 transition-all ease-in-out hover:bg-orange-500 hover:text-white group" />
+              <span>Profile</span>
+            </DropdownMenuItem>
+          </Link>
+          <Link href={`/${user?.role}/settings`}>
+            <DropdownMenuItem className="cursor-pointer duration-300 transition-all ease-in-out hover:bg-orange-500 hover:text-white group">
+              <Settings className="mr-2 h-4 w-4 duration-300 transition-all ease-in-out hover:bg-orange-500 hover:text-white group" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+          </Link>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={handleLogout}
