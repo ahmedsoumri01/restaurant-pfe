@@ -12,6 +12,7 @@ const {
   getAllUsers,
   changeAccountStatus,
   createRestaurantOwner,
+  deleteUser,
 } = adminController;
 
 // 🔹 Get Admin Profile
@@ -38,5 +39,8 @@ router.post(
   adminMiddleware,
   createRestaurantOwner
 );
+
+// 🔹 Delete User
+router.delete("/users/:userId", authMiddleware, adminMiddleware, deleteUser);
 
 module.exports = router;

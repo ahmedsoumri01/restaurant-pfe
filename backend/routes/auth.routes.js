@@ -4,6 +4,7 @@ const {
   getLoggedUser,
   login,
   logout,
+  changePassword,
 } = require("../controllers/auth.controller");
 const {
   authMiddleware,
@@ -57,5 +58,13 @@ router.get(
 );
 router.get("/me/livreur", authMiddleware, livreurMiddleware, getLoggedUser);
 router.get("/me/admin", authMiddleware, adminMiddleware, getLoggedUser);
+
+// 🔹 Change Password Route
+router.put(
+  "/change-password",
+  authMiddleware,
+
+  changePassword
+);
 
 module.exports = router;

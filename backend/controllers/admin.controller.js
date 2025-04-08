@@ -128,3 +128,20 @@ exports.createRestaurantOwner = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+// 🔹 Delete User
+exports.deleteUser = async (req, res) => {
+  try {
+    const { userId } = req.params; // Get the user ID from the URL parameters
+
+    // Find and delete the user
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ message: "User deleted successfully", user: deletedUser });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
