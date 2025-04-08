@@ -55,11 +55,9 @@ const formSchema = z.object({
       message: "Le numéro de téléphone doit contenir au moins 8 caractères",
     })
     .regex(/^[0-9+\s()-]+$/, { message: "Format de téléphone invalide" }),
-  description: z
-    .string()
-    .min(10, {
-      message: "La description doit contenir au moins 10 caractères",
-    }),
+  description: z.string().min(10, {
+    message: "La description doit contenir au moins 10 caractères",
+  }),
   workingHoursFrom: z.string().regex(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/, {
     message: "Format d'heure invalide (HH:MM)",
   }),
@@ -154,8 +152,8 @@ export default function CreateRestaurant() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <Card className="max-w-3xl mx-auto">
+    <div className="">
+      <Card className="border-none rounded-none">
         <CardHeader>
           <CardTitle className="text-2xl">Créer votre restaurant</CardTitle>
           <CardDescription>

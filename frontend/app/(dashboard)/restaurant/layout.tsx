@@ -29,7 +29,7 @@ export default function RestaurantLayout({
           isCollapsed ? "ml-[70px]" : "ml-[250px]"
         )}
       >
-        <div className="p-6 h-[calc(100vh-4rem)] overflow-auto">{children}</div>
+        <div className=" h-[calc(100vh-4rem)] overflow-auto">{children}</div>
       </main>
     </div>
   );

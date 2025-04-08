@@ -215,8 +215,8 @@ export default function UpdateRestaurant() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <Card className="max-w-3xl mx-auto">
+    <div>
+      <Card className="border-none rounded-none">
         <CardHeader>
           <CardTitle className="text-2xl">Modifier votre restaurant</CardTitle>
           <CardDescription>
