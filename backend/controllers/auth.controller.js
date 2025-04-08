@@ -24,6 +24,7 @@ exports.register = async (req, res) => {
       motDePasse: hashedPassword,
       telephone,
       role: "client",
+      statut: "active",
     });
 
     await user.save();

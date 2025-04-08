@@ -1,9 +1,12 @@
 const User = require("../models/User");
-const Restaurant = require("../models/Restaurant");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const { validationResult } = require("express-validator");
 require("dotenv").config();
+const {
+  sendRestaurantOwnerWelcomeEmail,
+  sendAccountSuspensionEmail,
+  sendAccountActivationEmail,
+  sendAccountDeletionEmail,
+} = require("../middlewares/mailSender");
 
 // 🔹 Get Admin Profile
 exports.getAdminProfile = async (req, res) => {
@@ -89,6 +92,12 @@ exports.changeAccountStatus = async (req, res) => {
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
+    // Send email notification based on the new status
+    if (statut === "blocked") {
+      await sendAccountSuspensionEmail(updatedUser);
+    } else if (statut === "active") {
+      await sendAccountActivationEmail(updatedUser);
+    }
 
     res.json({
       message: "Account status updated successfully",
@@ -122,7 +131,7 @@ exports.createRestaurantOwner = async (req, res) => {
       telephone,
       adresse,
       role: "restaurant",
-      statut: "pending", // Default status for new restaurant owners
+      statut: "active", // Default status for new restaurant owners
     };
 
     // If a profile image was uploaded, add it to the user data
@@ -133,7 +142,11 @@ exports.createRestaurantOwner = async (req, res) => {
     // Create and save the restaurant owner
     const restaurantOwner = new User(restaurantOwnerData);
     await restaurantOwner.save();
-
+    // Send welcome email to the restaurant owner
+    await sendRestaurantOwnerWelcomeEmail(nom, prenom, email, motDePasse);
+    // Remove the password field before sending the response
+    const responseUser = restaurantOwner.toObject();
+    delete responseUser.motDePasse;
     res.status(201).json({
       message: "Restaurant owner created successfully",
       restaurantOwner,
@@ -153,7 +166,7 @@ exports.deleteUser = async (req, res) => {
     if (!deletedUser) {
       return res.status(404).json({ message: "User not found" });
     }
-
+    await sendAccountDeletionEmail(deletedUser);
     res.json({ message: "User deleted successfully", user: deletedUser });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
