@@ -287,89 +287,91 @@ export default function UserManagement() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow key={user._id} className="hover:bg-gray-50">
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10 border">
-                      <AvatarImage
-                        src={user.photoProfil || ""}
-                        alt={user.nom || ""}
-                      />
-                      <AvatarFallback className="bg-primary/10 text-primary">
-                        {user.nom?.charAt(0) || ""}
-                        {user.prenom?.charAt(0) || ""}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">
-                        {user.nom} {user.prenom}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {user.email}
-                      </p>
+            {!isLoading &&
+              filteredUsers.map((user) => (
+                <TableRow key={user._id} className="hover:bg-gray-50">
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10 border">
+                        <AvatarImage
+                          src={user.photoProfil || ""}
+                          alt={user.nom || ""}
+                        />
+                        <AvatarFallback className="bg-primary/10 text-primary">
+                          {user.nom?.charAt(0) || ""}
+                          {user.prenom?.charAt(0) || ""}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium">
+                          {user.nom} {user.prenom}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>{getRoleBadge(user.role)}</TableCell>
-                <TableCell>{getStatusBadge(user.statut)}</TableCell>
-                <TableCell>
-                  <p>{user.telephone || "N/A"}</p>
-                  <p className="text-sm text-muted-foreground truncate max-w-[200px]">
-                    {user.adresse || "N/A"}
-                  </p>
-                </TableCell>
-                <TableCell>
-                  {loggedUser?._id !== user._id && ( // Prevent self-action
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger className="w-full">
-                            <Button
-                              variant="ghost"
-                              className="w-full justify-between"
-                            >
-                              Change Status <ChevronDown className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleStatusChange(user._id, "active")
-                              }
-                              disabled={user.statut === "active"}
-                            >
-                              Set Active
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleStatusChange(user._id, "pending")
-                              }
-                              disabled={user.statut === "pending"}
-                            >
-                              Set Pending
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() =>
-                                handleStatusChange(user._id, "blocked")
-                              }
-                              disabled={user.statut === "blocked"}
-                            >
-                              Block User
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
+                  </TableCell>
+                  <TableCell>{getRoleBadge(user.role)}</TableCell>
+                  <TableCell>{getStatusBadge(user.statut)}</TableCell>
+                  <TableCell>
+                    <p>{user.telephone || "N/A"}</p>
+                    <p className="text-sm text-muted-foreground truncate max-w-[200px]">
+                      {user.adresse || "N/A"}
+                    </p>
+                  </TableCell>
+                  <TableCell>
+                    {loggedUser?._id !== user._id && ( // Prevent self-action
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger className="w-full">
+                              <Button
+                                variant="ghost"
+                                className="w-full justify-between"
+                              >
+                                Change Status{" "}
+                                <ChevronDown className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStatusChange(user._id, "active")
+                                }
+                                disabled={user.statut === "active"}
+                              >
+                                Set Active
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStatusChange(user._id, "pending")
+                                }
+                                disabled={user.statut === "pending"}
+                              >
+                                Set Pending
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() =>
+                                  handleStatusChange(user._id, "blocked")
+                                }
+                                disabled={user.statut === "blocked"}
+                              >
+                                Block User
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
             {filteredUsers.length === 0 && !isLoading && (
               <TableRow>
                 <TableCell colSpan={5} className="text-center py-12">
