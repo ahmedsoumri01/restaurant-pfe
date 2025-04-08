@@ -173,17 +173,17 @@ export const restaurantSidebarConfig: SidebarConfig = {
     },
     {
       title: "mon restaurant",
-      path: "/restaurant/menu",
+      path: "/restaurant/restaurant-managemnt",
       icon: Store,
       submenu: [
         {
           title: "restaurant profile",
-          path: "/restaurant/profile",
+          path: "/restaurant/restaurant-managemnt",
           icon: FileText,
         },
         {
           title: "update my restaurant",
-          path: "/restaurant/profile/update",
+          path: "/restaurant/restaurant-managemnt/create-restaurant",
           icon: FileText,
         },
       ],
