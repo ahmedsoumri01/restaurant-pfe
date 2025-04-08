@@ -25,7 +25,7 @@ exports.getAdminProfile = async (req, res) => {
 exports.updateAdminProfile = async (req, res) => {
   try {
     const adminId = req.user.id;
-    const { nom, prenom, email, telephone, adresse, photoProfil } = req.body;
+    const { nom, prenom, email, telephone, adresse } = req.body;
 
     // Check if the email is already used by another user
     const existingUser = await User.findOne({ email });
@@ -33,12 +33,19 @@ exports.updateAdminProfile = async (req, res) => {
       return res.status(400).json({ message: "Email is already in use" });
     }
 
+    // Prepare update data
+    const updateData = { nom, prenom, email, telephone, adresse };
+
+    // If a profile image was uploaded, add it to the update data
+    if (req.body.profileImage) {
+      updateData.photoProfil = req.body.profileImage;
+    }
+
     // Update the admin's profile
-    const updatedAdmin = await User.findByIdAndUpdate(
-      adminId,
-      { nom, prenom, email, telephone, adresse, photoProfil },
-      { new: true, runValidators: true }
-    ).select("-motDePasse");
+    const updatedAdmin = await User.findByIdAndUpdate(adminId, updateData, {
+      new: true,
+      runValidators: true,
+    }).select("-motDePasse");
 
     res.json({
       message: "Admin profile updated successfully",
@@ -106,8 +113,8 @@ exports.createRestaurantOwner = async (req, res) => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(motDePasse, 10);
 
-    // Create the restaurant owner
-    const restaurantOwner = new User({
+    // Create the restaurant owner data
+    const restaurantOwnerData = {
       nom,
       prenom,
       email,
@@ -116,8 +123,15 @@ exports.createRestaurantOwner = async (req, res) => {
       adresse,
       role: "restaurant",
       statut: "pending", // Default status for new restaurant owners
-    });
+    };
 
+    // If a profile image was uploaded, add it to the user data
+    if (req.body.profileImage) {
+      restaurantOwnerData.photoProfil = req.body.profileImage;
+    }
+
+    // Create and save the restaurant owner
+    const restaurantOwner = new User(restaurantOwnerData);
     await restaurantOwner.save();
 
     res.status(201).json({

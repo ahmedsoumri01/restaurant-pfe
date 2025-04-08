@@ -5,7 +5,7 @@ const {
   authMiddleware,
   adminMiddleware,
 } = require("../middlewares/auth.middleware");
-
+const uploadMiddleware = require("../middlewares/upload.middleware");
 const {
   getAdminProfile,
   updateAdminProfile,
@@ -19,7 +19,13 @@ const {
 router.get("/profile", authMiddleware, adminMiddleware, getAdminProfile);
 
 // 🔹 Update Admin Profile
-router.put("/profile", authMiddleware, adminMiddleware, updateAdminProfile);
+router.put(
+  "/profile",
+  authMiddleware,
+  adminMiddleware,
+  uploadMiddleware.uploadProfileImage,
+  updateAdminProfile
+);
 
 // 🔹 Get All Users
 router.get("/users", authMiddleware, adminMiddleware, getAllUsers);
@@ -37,6 +43,7 @@ router.post(
   "/restaurant-owner",
   authMiddleware,
   adminMiddleware,
+  uploadMiddleware.uploadProfileImage,
   createRestaurantOwner
 );
 
