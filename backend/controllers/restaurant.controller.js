@@ -132,9 +132,9 @@ exports.checkRestaurantDataCompleted = async (req, res) => {
 exports.completeRestaurantInformation = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { nom, adresse, telephone, description, workingHours, images } =
+    const { nom, adresse, telephone, description, workingHours, imagePaths } =
       req.body;
-
+    console.log(req.body);
     // Check if the restaurant already exists
     const existingRestaurant = await Restaurant.findOne({
       proprietaire: userId,
@@ -151,7 +151,7 @@ exports.completeRestaurantInformation = async (req, res) => {
       telephone,
       description,
       workingHours,
-      images: images || [],
+      images: imagePaths || [],
     });
 
     await restaurant.save();
@@ -168,9 +168,9 @@ exports.completeRestaurantInformation = async (req, res) => {
 exports.updateRestaurantInformation = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { nom, adresse, telephone, description, workingHours, images } =
+    const { nom, adresse, telephone, description, workingHours, imagePaths } =
       req.body;
-
+    console.log(req.body);
     // Find the restaurant owned by the user
     const restaurant = await Restaurant.findOne({ proprietaire: userId });
     if (!restaurant) {
@@ -183,7 +183,7 @@ exports.updateRestaurantInformation = async (req, res) => {
     restaurant.telephone = telephone || restaurant.telephone;
     restaurant.description = description || restaurant.description;
     restaurant.workingHours = workingHours || restaurant.workingHours;
-    restaurant.images = images || restaurant.images;
+    restaurant.images = imagePaths || restaurant.images;
 
     await restaurant.save();
 

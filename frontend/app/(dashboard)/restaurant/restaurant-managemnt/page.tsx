@@ -41,7 +41,7 @@ export default function RestaurantPage() {
     loadData();
   }, [getOwnerProfile, checkRestaurantDataCompleted, getAllCategories]);
 
-  if (!isLoading) {
+  if (!isDataLoaded) {
     return <RestaurantPageSkeleton />;
   }
 
@@ -180,7 +180,10 @@ export default function RestaurantPage() {
                   className="aspect-video relative rounded-lg overflow-hidden"
                 >
                   <Image
-                    src={image || "/placeholder.svg?height=300&width=500"}
+                    src={
+                      process.env.NEXT_PUBLIC_APP_URL + image ||
+                      "/placeholder.svg?height=300&width=500"
+                    }
                     alt={`Restaurant image ${index + 1}`}
                     fill
                     className="object-cover"
