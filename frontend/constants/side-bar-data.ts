@@ -183,7 +183,7 @@ export const restaurantSidebarConfig: SidebarConfig = {
         },
         {
           title: "update my restaurant",
-          path: "/restaurant/restaurant-managemnt/create-restaurant",
+          path: "/restaurant/restaurant-managemnt/update-restaurant",
           icon: FileText,
         },
       ],

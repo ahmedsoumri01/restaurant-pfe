@@ -134,7 +134,7 @@ const useRestaurantStore = create<RestaurantState>()(
             toast.error(errorMessage);
             return null;
           }
-        },
+        }, //work successfully
 
         // Update My Profile
         updateOwnerProfile: async (data: ProfileUpdate | FormData) => {
@@ -168,7 +168,7 @@ const useRestaurantStore = create<RestaurantState>()(
             toast.error(errorMessage);
             return false;
           }
-        },
+        }, //work successfully
 
         // Update My Password
         updateOwnerPassword: async (
@@ -193,7 +193,7 @@ const useRestaurantStore = create<RestaurantState>()(
             toast.error(errorMessage);
             return false;
           }
-        },
+        }, //work successfully
 
         // Check if Restaurant Data is Completed
         checkRestaurantDataCompleted: async () => {
@@ -217,7 +217,7 @@ const useRestaurantStore = create<RestaurantState>()(
             toast.error(errorMessage);
             return false;
           }
-        },
+        }, //work successfully
 
         // Complete Restaurant Information
         completeRestaurantInformation: async (
@@ -250,7 +250,7 @@ const useRestaurantStore = create<RestaurantState>()(
             toast.error(errorMessage);
             return false;
           }
-        },
+        }, //work successfully
 
         // Update Restaurant Information
         updateRestaurantInformation: async (

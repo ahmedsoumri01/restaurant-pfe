@@ -108,7 +108,7 @@ export default function RestaurantPage() {
             </div>
           </div>
           <Button className="mt-4 md:mt-0" asChild>
-            <Link href="/restaurant/restaurant-managemnt/edit-restaurant">
+            <Link href="/restaurant/restaurant-managemnt/update-restaurant">
               Modifier les informations
             </Link>
           </Button>
