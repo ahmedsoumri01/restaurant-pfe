@@ -4,6 +4,7 @@ const cors = require("cors");
 const connectDB = require("./config/db.js");
 const path = require("path");
 const authRoutes = require("./routes/auth.routes");
+const adminRoutes = require("./routes/admin.routes");
 const { createAdminAccount } = require("./controllers/auth.controller");
 
 // Load environment variables from .env file
@@ -32,6 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Define a simple route for testing
 app.get("/", (req, res) => {
