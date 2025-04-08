@@ -4,7 +4,7 @@ import { Menu, Search } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import UserDropdown from "./UserDropdown";
+import UserDropdown from "./UserDropdown.tsx";
 import Image from "next/image";
 import logo from "@/public/logo.png";
 import useAuthStore from "@/store/useAuthStore";

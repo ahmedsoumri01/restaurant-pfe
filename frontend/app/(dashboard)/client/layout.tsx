@@ -4,9 +4,9 @@ import type React from "react";
 
 import { useState } from "react";
 import Header from "@/components/header/Header";
-import SideBar, { clientSidebarConfig } from "@/components/side-bar/side-bar";
+import SideBar from "@/components/side-bar/side-bar";
 import { cn } from "@/lib/utils";
-
+import { clientSidebarConfig } from "@/constants/side-bar-data";
 export default function ClientLayout({
   children,
 }: {

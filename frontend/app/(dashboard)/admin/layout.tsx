@@ -4,7 +4,8 @@ import type React from "react";
 
 import { useState } from "react";
 import Header from "@/components/header/Header";
-import SideBar, { adminSidebarConfig } from "@/components/side-bar/side-bar";
+import SideBar from "@/components/side-bar/side-bar";
+import { adminSidebarConfig } from "@/constants/side-bar-data";
 import { cn } from "@/lib/utils";
 export default function AdminLayout({
   children,

@@ -4,9 +4,8 @@ import type React from "react";
 
 import { useState } from "react";
 import Header from "@/components/header/Header";
-import SideBar, {
-  restaurantSidebarConfig,
-} from "@/components/side-bar/side-bar";
+import SideBar from "@/components/side-bar/side-bar";
+import { restaurantSidebarConfig } from "@/constants/side-bar-data";
 import { cn } from "@/lib/utils";
 
 export default function RestaurantLayout({

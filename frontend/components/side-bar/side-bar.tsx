@@ -9,15 +9,7 @@ import {
   ChevronRight,
   LayoutDashboard,
   Store,
-  Bike,
-  AppWindow,
-  BarChart3,
-  LifeBuoy,
-  Puzzle,
-  Settings,
   FileText,
-  TableIcon,
-  Files,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -31,7 +23,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
+import { adminSidebarConfig } from "@/constants/side-bar-data";
 // Define types for our sidebar items
 export type SidebarItemType = {
   title: string;
@@ -43,145 +35,6 @@ export type SidebarItemType = {
 export type SidebarConfig = {
   mainMenu: SidebarItemType[];
   otherMenu?: SidebarItemType[];
-};
-
-// Sample sidebar configurations for different dashboards
-export const adminSidebarConfig: SidebarConfig = {
-  mainMenu: [
-    {
-      title: "Dashboard",
-      path: "/admin",
-      icon: LayoutDashboard,
-    },
-    {
-      title: "Restaurant",
-      path: "/admin/restaurant",
-      icon: Store,
-      submenu: [
-        {
-          title: "All Restaurants",
-          path: "/admin/restaurant/all",
-          icon: Store,
-        },
-        {
-          title: "Add Restaurant",
-          path: "/admin/restaurant/add",
-          icon: Store,
-        },
-      ],
-    },
-    {
-      title: "Drivers",
-      path: "/admin/drivers",
-      icon: Bike,
-    },
-  ],
-  otherMenu: [
-    {
-      title: "Apps",
-      path: "/admin/apps",
-      icon: AppWindow,
-    },
-    {
-      title: "Charts",
-      path: "/admin/charts",
-      icon: BarChart3,
-    },
-    {
-      title: "Bootstrap",
-      path: "/admin/bootstrap",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Plugins",
-      path: "/admin/plugins",
-      icon: Puzzle,
-      submenu: [
-        {
-          title: "Plugin 1",
-          path: "/admin/plugins/1",
-          icon: Puzzle,
-        },
-        {
-          title: "Plugin 2",
-          path: "/admin/plugins/2",
-          icon: Puzzle,
-        },
-      ],
-    },
-    {
-      title: "Widget",
-      path: "/admin/widget",
-      icon: Settings,
-    },
-    {
-      title: "Forms",
-      path: "/admin/forms",
-      icon: FileText,
-    },
-    {
-      title: "Table",
-      path: "/admin/table",
-      icon: TableIcon,
-    },
-    {
-      title: "Pages",
-      path: "/admin/pages",
-      icon: Files,
-    },
-  ],
-};
-
-export const clientSidebarConfig: SidebarConfig = {
-  mainMenu: [
-    {
-      title: "Dashboard",
-      path: "/client",
-      icon: LayoutDashboard,
-    },
-    {
-      title: "Orders",
-      path: "/client/orders",
-      icon: FileText,
-    },
-    {
-      title: "Favorites",
-      path: "/client/favorites",
-      icon: Store,
-    },
-  ],
-};
-
-export const restaurantSidebarConfig: SidebarConfig = {
-  mainMenu: [
-    {
-      title: "Dashboard",
-      path: "/restaurant",
-      icon: LayoutDashboard,
-    },
-    {
-      title: "Menu",
-      path: "/restaurant/menu",
-      icon: FileText,
-      submenu: [
-        {
-          title: "All Items",
-          path: "/restaurant/menu/all",
-          icon: FileText,
-        },
-        {
-          title: "Add Item",
-          path: "/restaurant/menu/add",
-          icon: FileText,
-        },
-      ],
-    },
-    {
-      title: "Orders",
-      path: "/restaurant/orders",
-      icon: Store,
-    },
-  ],
 };
 
 type SideBarProps = {
