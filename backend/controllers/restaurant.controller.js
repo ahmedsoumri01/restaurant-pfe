@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const Restaurant = require("../models/Restaurant");
 const Categorie = require("../models/Categorie");
 require("dotenv").config();
-const { deleteFile } = require("../middlewares/uploadMiddleware");
+const { deleteFile } = require("../middlewares/upload.middleware");
 
 // 🔹 Get My Owner Profile
 exports.myOwnerProfile = async (req, res) => {

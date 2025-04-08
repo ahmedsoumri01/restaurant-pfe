@@ -172,6 +172,23 @@ export const restaurantSidebarConfig: SidebarConfig = {
       icon: LayoutDashboard,
     },
     {
+      title: "mon restaurant",
+      path: "/restaurant/menu",
+      icon: Store,
+      submenu: [
+        {
+          title: "restaurant profile",
+          path: "/restaurant/profile",
+          icon: FileText,
+        },
+        {
+          title: "update my restaurant",
+          path: "/restaurant/profile/update",
+          icon: FileText,
+        },
+      ],
+    },
+    {
       title: "Gestion du menu",
       path: "/restaurant/menu",
       icon: FileText,
