@@ -195,13 +195,7 @@ export const restaurantSidebarConfig: SidebarConfig = {
       submenu: [
         {
           title: "tous les plat",
-          path: "/restaurant/menu/all",
-          icon: FileText,
-        },
-
-        {
-          title: "ajout plat",
-          path: "/restaurant/menu/add",
+          path: "/restaurant/menu-managemnt",
           icon: FileText,
         },
       ],
