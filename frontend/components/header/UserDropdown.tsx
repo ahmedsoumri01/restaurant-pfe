@@ -34,7 +34,7 @@ export default function UserDropdown({}: Props) {
     user?.nom && user?.prenom
       ? `${user.nom.charAt(0)}${user.prenom.charAt(0)}`
       : "U";
-
+  console.log({ user });
   return (
     <div>
       {" "}
@@ -43,7 +43,9 @@ export default function UserDropdown({}: Props) {
           <Button className="bg-white h-[45px] cursor-pointer hover:bg-white/90">
             <Avatar className="h-10 w-10 border-2 border-white">
               <AvatarImage
-                src="/placeholder.svg?height=40&width=40"
+                src={`${process.env.NEXT_PUBLIC_APP_URL || ""}${
+                  user.photoProfil || ""
+                }`}
                 alt="User"
               />
               <AvatarFallback className="bg-orange-200 text-orange-800">

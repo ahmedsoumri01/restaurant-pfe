@@ -56,11 +56,11 @@ export const adminSidebarConfig: SidebarConfig = {
           path: "/admin/restaurant/all",
           icon: Store,
         },
-        {
+        /*  {
           title: "Add Restaurant",
           path: "/admin/restaurant/add",
           icon: Store,
-        },
+        }, */
       ],
     },
     {

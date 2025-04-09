@@ -186,7 +186,7 @@ export default function UpdateRestaurant() {
       const imagesToKeep = existingImages.filter(
         (img) => !imagesToRemove.includes(img)
       );
-      formData.append("existingImages", JSON.stringify(imagesToKeep));
+      formData.append("images", JSON.stringify(imagesToKeep));
 
       // Append all new images
       newImages.forEach((image) => {

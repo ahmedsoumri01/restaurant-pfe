@@ -132,8 +132,8 @@ exports.checkRestaurantDataCompleted = async (req, res) => {
 exports.completeRestaurantInformation = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { nom, adresse, telephone, description, workingHours, imagePaths } =
-      req.body;
+    const { nom, adresse, telephone, description, workingHours } = req.body;
+    const imagePaths = req.body.newImagePaths || [];
     console.log(req.body);
     // Check if the restaurant already exists
     const existingRestaurant = await Restaurant.findOne({
@@ -164,17 +164,54 @@ exports.completeRestaurantInformation = async (req, res) => {
   }
 };
 
-// 🔹 Update Restaurant Information
+// Controller to update restaurant info
 exports.updateRestaurantInformation = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { nom, adresse, telephone, description, workingHours, imagePaths } =
-      req.body;
+    const {
+      nom,
+      adresse,
+      telephone,
+      description,
+      workingHours,
+      images, // Existing images we want to keep
+      newImagePaths, // From middleware - newly uploaded images
+    } = req.body;
+
     console.log(req.body);
+
     // Find the restaurant owned by the user
     const restaurant = await Restaurant.findOne({ proprietaire: userId });
     if (!restaurant) {
       return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    // Parse existing images from string to array if it's a string
+    let imagesToKeep = [];
+    if (images) {
+      if (typeof images === "string") {
+        try {
+          imagesToKeep = JSON.parse(images);
+        } catch (e) {
+          // If it's already in string format but not JSON format, it might be a single image
+          imagesToKeep = images.split(",").filter((img) => img.trim());
+        }
+      } else if (Array.isArray(images)) {
+        imagesToKeep = images;
+      }
+    }
+
+    // Combine kept existing images with new images (if any)
+    let allImages = [...imagesToKeep];
+
+    // Add new image paths if they exist
+    if (newImagePaths && newImagePaths.length > 0) {
+      allImages = [...allImages, ...newImagePaths];
+    }
+
+    // If no images at all, keep current images (shouldn't happen with frontend validation)
+    if (allImages.length === 0) {
+      allImages = restaurant.images;
     }
 
     // Update the restaurant's information
@@ -183,10 +220,9 @@ exports.updateRestaurantInformation = async (req, res) => {
     restaurant.telephone = telephone || restaurant.telephone;
     restaurant.description = description || restaurant.description;
     restaurant.workingHours = workingHours || restaurant.workingHours;
-    restaurant.images = imagePaths || restaurant.images;
+    restaurant.images = allImages;
 
     await restaurant.save();
-
     res.json({ message: "Restaurant updated successfully", restaurant });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });

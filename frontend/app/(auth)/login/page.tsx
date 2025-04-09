@@ -62,7 +62,7 @@ export default function Login() {
       window.location.href = "/livreur";
       return null;
     } else if (user?.role === "restaurant") {
-      window.location.href = "/livreur";
+      window.location.href = "/restaurant";
       return null;
     } else if (user?.role === "client") {
       window.location.href = "/client";

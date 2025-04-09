@@ -192,19 +192,22 @@ exports.uploadSingleImage = (req, res, next) => {
 
 // Middleware for multiple images upload
 exports.uploadMultipleImages = (req, res, next) => {
-  const upload = multipleImageUpload.array("images", 5); // Allow up to 5 images
+  // Support both "images" (for create) and "newImages" (for update)
+  const upload = multipleImageUpload.array("newImages", 5);
 
   upload(req, res, function (err) {
     if (err) {
       return handleUploadError(err, res);
     }
 
+    // If new files were uploaded, add their paths to req.body
     if (req.files && req.files.length > 0) {
-      const imagePaths = req.files.map(
+      const newImagePaths = req.files.map(
         (file) => `/uploads/multiple/${file.filename}`
       );
-      req.body.imagePaths = imagePaths;
+      req.body.newImagePaths = newImagePaths;
     }
+
     next();
   });
 };

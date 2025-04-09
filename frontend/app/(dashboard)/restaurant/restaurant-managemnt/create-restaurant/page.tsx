@@ -133,7 +133,7 @@ export default function CreateRestaurant() {
 
       // Append all images
       uploadedImages.forEach((image) => {
-        formData.append("images", image);
+        formData.append("newImages", image);
       });
 
       // Submit the form data
