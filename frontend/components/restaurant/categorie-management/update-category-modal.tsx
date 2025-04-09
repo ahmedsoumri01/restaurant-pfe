@@ -119,7 +119,7 @@ export default function UpdateCategoryModal({
 
       // Only append image if it was changed
       if (imageFile) {
-        formData.append("image", imageFile);
+        formData.append("categoryImage", imageFile);
       }
 
       // Submit the form data
@@ -190,7 +190,10 @@ export default function UpdateCategoryModal({
                 <div className="mt-2 relative">
                   <div className="relative aspect-video w-full rounded-md overflow-hidden border">
                     <Image
-                      src={imagePreview || "/placeholder.svg"}
+                      src={
+                        process.env.NEXT_PUBLIC_APP_URL + imagePreview ||
+                        "/placeholder.svg"
+                      }
                       alt="Category preview"
                       fill
                       className="object-cover"

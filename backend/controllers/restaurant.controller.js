@@ -4,6 +4,7 @@ const Restaurant = require("../models/Restaurant");
 const Categorie = require("../models/Categorie");
 require("dotenv").config();
 const { deleteFile } = require("../middlewares/upload.middleware");
+const Plat = require("../models/Plat");
 
 // 🔹 Get My Owner Profile
 exports.myOwnerProfile = async (req, res) => {
@@ -319,30 +320,21 @@ exports.getAllCategories = async (req, res) => {
 exports.deleteCategory = async (req, res) => {
   try {
     const { categoryId } = req.params;
-
+    console.log(categoryId);
     // Find the category
     const category = await Categorie.findById(categoryId);
     if (!category) {
       return res.status(404).json({ message: "Category not found" });
     }
-
     // Delete the category image
     if (category.image) {
       deleteFile(category.image);
     }
-
-    // Remove the category from the restaurant's categories array
-    const restaurant = await Restaurant.findOne({ categories: categoryId });
-    if (restaurant) {
-      restaurant.categories.pull(categoryId);
-      await restaurant.save();
-    }
+    //delete that category from the restaurant categories array
+    await Categorie.deleteOne({ _id: categoryId });
 
     // Delete all associated dishes
     await Plat.deleteMany({ categorie: categoryId });
-
-    // Delete the category
-    await category.remove();
 
     res.json({ message: "Category deleted successfully" });
   } catch (error) {
