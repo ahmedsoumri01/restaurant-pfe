@@ -327,7 +327,10 @@ export default function UserManagement() {
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10 border">
                         <AvatarImage
-                          src={user.photoProfil || ""}
+                          src={
+                            process.env.NEXT_PUBLIC_APP_URL +
+                            (user.photoProfil ?? "")
+                          }
                           alt={user.nom || ""}
                         />
                         <AvatarFallback className="bg-primary/10 text-primary">
@@ -381,14 +384,14 @@ export default function UserManagement() {
                               >
                                 Set Active
                               </DropdownMenuItem>
-                              <DropdownMenuItem
+                              {/*     <DropdownMenuItem
                                 onClick={() =>
                                   handleStatusChange(user._id, "pending")
                                 }
                                 disabled={user.statut === "pending"}
                               >
                                 Set Pending
-                              </DropdownMenuItem>
+                              </DropdownMenuItem> */}
                               <DropdownMenuItem
                                 onClick={() =>
                                   handleStatusChange(user._id, "blocked")
