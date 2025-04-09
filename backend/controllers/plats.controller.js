@@ -152,19 +152,16 @@ exports.updatePlat = async (req, res) => {
 exports.deletePlat = async (req, res) => {
   try {
     const { platId } = req.params;
+    console.log(req.body);
+    console.log(req.params);
+    console.log(platId);
 
     // Find the plat by ID
     const plat = await Plat.findById(platId);
     if (!plat) {
       return res.status(404).json({ message: "Plat not found" });
     }
-
-    // Remove the plat from the restaurant's plats array
-    const restaurant = await Restaurant.findById(plat.restaurant);
-    if (restaurant) {
-      restaurant.plats.pull(platId);
-      await restaurant.save();
-    }
+    console.log(plat);
 
     // Delete the plat's images and videos
     if (plat.images.length > 0) {
@@ -174,8 +171,8 @@ exports.deletePlat = async (req, res) => {
       plat.videos.forEach((video) => deleteFile(video));
     }
 
-    // Delete the plat
-    await plat.remove();
+    //remove that plats from data base
+    await Plat.findByIdAndDelete(platId);
 
     res.json({ message: "Plat deleted successfully" });
   } catch (error) {
