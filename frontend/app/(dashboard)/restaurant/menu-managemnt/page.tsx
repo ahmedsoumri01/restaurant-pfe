@@ -43,7 +43,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import PlatsTableSkeleton from "@/components/restaurant/menu-management/plats-table-skeleton";
 import {
   Select,
   SelectContent,
@@ -147,7 +147,7 @@ export default function PlatsTable() {
   };
 
   return (
-    <Card>
+    <Card className="border-none rounded-none min-h-screen">
       <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
         <div>
           <CardTitle className="text-2xl">Gestion des plats</CardTitle>
@@ -215,7 +215,7 @@ export default function PlatsTable() {
                       <div className="relative h-10 w-10 rounded-md overflow-hidden">
                         <Image
                           src={
-                            plat.images[0] ||
+                            process.env.NEXT_PUBLIC_APP_URL + plat.images[0] ||
                             "/placeholder.svg?height=40&width=40"
                           }
                           alt={plat.nom}
@@ -323,14 +323,16 @@ export default function PlatsTable() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Annuler</AlertDialogCancel>
+            <AlertDialogCancel className="cursor-pointer" disabled={isDeleting}>
+              Annuler
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
                 handleDeleteConfirm();
               }}
               disabled={isDeleting}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-white hover:bg-red-400 cursor-pointer "
             >
               {isDeleting ? "Suppression..." : "Supprimer"}
             </AlertDialogAction>
@@ -338,48 +340,5 @@ export default function PlatsTable() {
         </AlertDialogContent>
       </AlertDialog>
     </Card>
-  );
-}
-
-function PlatsTableSkeleton() {
-  return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[80px]">Image</TableHead>
-            <TableHead>Nom</TableHead>
-            <TableHead>Prix</TableHead>
-            <TableHead className="hidden md:table-cell">Catégorie</TableHead>
-            <TableHead className="hidden md:table-cell">Statut</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {[1, 2, 3, 4].map((i) => (
-            <TableRow key={i}>
-              <TableCell>
-                <Skeleton className="h-10 w-10 rounded-md" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-5 w-32" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-5 w-16" />
-              </TableCell>
-              <TableCell className="hidden md:table-cell">
-                <Skeleton className="h-5 w-24" />
-              </TableCell>
-              <TableCell className="hidden md:table-cell">
-                <Skeleton className="h-5 w-20" />
-              </TableCell>
-              <TableCell className="text-right">
-                <Skeleton className="h-9 w-9 rounded-md ml-auto" />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
   );
 }

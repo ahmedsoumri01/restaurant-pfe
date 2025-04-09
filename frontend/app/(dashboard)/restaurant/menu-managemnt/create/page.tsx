@@ -150,7 +150,7 @@ export default function CreatePlatForm() {
 
       if (success) {
         toast.success("Plat créé avec succès");
-        router.push("restaurant/menu-managemnt");
+        router.push("/restaurant/menu-managemnt");
       }
     } catch (error) {
       console.error("Error submitting form:", error);

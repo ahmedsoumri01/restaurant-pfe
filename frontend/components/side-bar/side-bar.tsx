@@ -170,14 +170,14 @@ function SidebarItem({ item, isActive, isCollapsed }: SidebarItemProps) {
         </div>
 
         {!isCollapsed && (
-          <CollapsibleContent>
+          <CollapsibleContent className="cursor-pointer">
             <div className="pl-9 space-y-1 mt-1">
               {item.submenu.map((subItem, index) => (
                 <Link
                   key={index}
                   href={subItem.path}
                   className={cn(
-                    "flex items-center px-4 py-2 text-sm rounded-md"
+                    "flex items-center px-4 py-2 text-sm rounded-md hover:bg-orange-50"
                     /*   pathname === subItem.path
                       ? "bg-orange-50 text-orange-500"
                       : "text-gray-700 hover:bg-orange-50 hover:text-orange-500" */
@@ -204,7 +204,7 @@ function SidebarItem({ item, isActive, isCollapsed }: SidebarItemProps) {
               <Link
                 href={item.path}
                 className={cn(
-                  "flex items-center justify-center h-10 w-full",
+                  "flex items-center  justify-center h-10 w-full",
                   isActive
                     ? "text-orange-500"
                     : "text-gray-700 hover:text-orange-500"
