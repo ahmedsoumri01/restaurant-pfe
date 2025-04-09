@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -34,7 +34,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 import useRestaurantStore from "@/store/useRestaurantStore";
-import CreateCategoryModal from "@/components/restaurant/categorie-management/create-category-modal";
 // Category type from the store
 interface Category {
   _id: string;

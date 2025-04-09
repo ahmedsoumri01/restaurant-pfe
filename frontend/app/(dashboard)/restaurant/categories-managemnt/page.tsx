@@ -143,7 +143,8 @@ export default function CategoriesPage() {
                         <div className="relative h-10 w-10 rounded-md overflow-hidden">
                           <Image
                             src={
-                              category.image ||
+                              process.env.NEXT_PUBLIC_APP_URL +
+                                category.image ||
                               "/placeholder.svg?height=40&width=40"
                             }
                             alt={category.nom}
