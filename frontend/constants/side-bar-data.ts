@@ -194,18 +194,26 @@ export const restaurantSidebarConfig: SidebarConfig = {
       icon: FileText,
       submenu: [
         {
-          title: "All plat",
+          title: "tous les plat",
           path: "/restaurant/menu/all",
           icon: FileText,
         },
+
+        {
+          title: "ajout plat",
+          path: "/restaurant/menu/add",
+          icon: FileText,
+        },
+      ],
+    },
+    {
+      title: "Gestion des categories",
+      path: "/restaurant/menu",
+      icon: FileText,
+      submenu: [
         {
           title: "All categories",
-          path: "/restaurant/menu/all",
-          icon: FileText,
-        },
-        {
-          title: "Add Item",
-          path: "/restaurant/menu/add",
+          path: "/restaurant/categories-managemnt",
           icon: FileText,
         },
       ],
