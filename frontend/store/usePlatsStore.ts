@@ -87,7 +87,7 @@ const usePlatsStore = create<PlatsState>()(
         getAllPlats: async () => {
           set({ isLoading: true, error: null });
           try {
-            const response = await api.get("/restaurant/plats");
+            const response = await api.get("/plats");
             const { plats } = response.data;
 
             set({
@@ -111,9 +111,7 @@ const usePlatsStore = create<PlatsState>()(
         getPlatsByCategory: async (categoryId: string) => {
           set({ isLoading: true, error: null });
           try {
-            const response = await api.get(
-              `/restaurant/plats/categories/${categoryId}`
-            );
+            const response = await api.get(`/plats/categories/${categoryId}`);
             const { plats } = response.data;
 
             set({
@@ -137,7 +135,7 @@ const usePlatsStore = create<PlatsState>()(
         getPlatById: async (platId: string) => {
           set({ isLoading: true, error: null });
           try {
-            const response = await api.get(`/restaurant/plats/${platId}`);
+            const response = await api.get(`/plats/${platId}`);
             const { plat } = response.data;
 
             set({
@@ -166,7 +164,7 @@ const usePlatsStore = create<PlatsState>()(
               ? { headers: { "Content-Type": "multipart/form-data" } }
               : undefined;
 
-            const response = await api.post("/restaurant/plats", data, config);
+            const response = await api.post("/plats", data, config);
             const { plat } = response.data;
 
             set({
@@ -196,11 +194,7 @@ const usePlatsStore = create<PlatsState>()(
               ? { headers: { "Content-Type": "multipart/form-data" } }
               : undefined;
 
-            const response = await api.put(
-              `/restaurant/plats/${platId}`,
-              data,
-              config
-            );
+            const response = await api.put(`/plats/${platId}`, data, config);
             const { plat } = response.data;
 
             // Update plats and filteredPlats arrays
@@ -234,7 +228,7 @@ const usePlatsStore = create<PlatsState>()(
         deletePlat: async (platId: string) => {
           set({ isLoading: true, error: null });
           try {
-            await api.delete(`/restaurant/plats/${platId}`);
+            await api.delete(`/plats/${platId}`);
 
             // Remove plat from plats and filteredPlats arrays
             const updatedPlats = get().plats.filter((p) => p._id !== platId);
@@ -264,9 +258,7 @@ const usePlatsStore = create<PlatsState>()(
         togglePlatStatus: async (platId: string) => {
           set({ isLoading: true, error: null });
           try {
-            const response = await api.put(
-              `/restaurant/plats/${platId}/status`
-            );
+            const response = await api.put(`/plats/${platId}/status`);
             const { plat } = response.data;
 
             // Update plats and filteredPlats arrays
