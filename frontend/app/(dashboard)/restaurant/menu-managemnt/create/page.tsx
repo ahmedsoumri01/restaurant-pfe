@@ -74,7 +74,7 @@ export default function CreatePlatForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Initialize form
-  const form = useForm<PlatFormValues>({
+  const form = useForm<any>({
     resolver: zodResolver(platFormSchema),
     defaultValues: {
       nom: "",
@@ -167,7 +167,7 @@ export default function CreatePlatForm() {
       if (values.ingredients) {
         const ingredientsArray = values.ingredients
           .split(",")
-          .map((item) => item.trim());
+          .map((item: any) => item.trim());
         // Change to match backend expectations
         formData.append("ingredients", JSON.stringify(ingredientsArray));
       }

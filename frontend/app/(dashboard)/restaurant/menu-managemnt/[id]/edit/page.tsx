@@ -201,7 +201,7 @@ export default function EditPlatPage() {
     <div className="container mx-auto py-6 max-w-5xl">
       <div className="mb-6">
         <Button variant="outline" asChild>
-          <Link href="/restaurant/menu-management">
+          <Link href="/restaurant/menu-managemnt">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Retour à la liste des plats
           </Link>
