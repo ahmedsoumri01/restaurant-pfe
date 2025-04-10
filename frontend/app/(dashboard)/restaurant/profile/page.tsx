@@ -11,10 +11,10 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useRestaurantStore from "@/store/useRestaurantStore";
-import { RestaurantProfileSkeleton } from "@/components/restaurant/restaurant-profile-skeleton";
-import { ProfileCard } from "@/components/restaurant/profile-card";
-import { UpdateProfileModal } from "@/components/restaurant/update-profile-modal";
-import { ChangePasswordModal } from "@/components/restaurant/change-password-modal";
+import { RestaurantProfileSkeleton } from "@/components/restaurant/profile/restaurant-profile-skeleton";
+import { ProfileCard } from "@/components/restaurant/profile/profile-card";
+import { UpdateProfileModal } from "@/components/restaurant/profile/update-profile-modal";
+import { ChangePasswordModal } from "@/components/restaurant/profile/change-password-modal";
 export default function page() {
   const { ownerProfile, getOwnerProfile, isLoading, error } =
     useRestaurantStore();

@@ -11,10 +11,10 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useClientStore from "@/store/useClientStore";
-import { ProfileCard } from "@/components/client/profile-card";
-import { UpdateProfileModal } from "@/components/client/update-profile-modal";
-import { ChangePasswordModal } from "@/components/client/change-password-modal";
-import { ClientProfileSkeleton } from "@/components/client/client-profile-skeleton";
+import { ProfileCard } from "@/components/client/profile/profile-card";
+import { UpdateProfileModal } from "@/components/client/profile/update-profile-modal";
+import { ChangePasswordModal } from "@/components/client/profile/change-password-modal";
+import { ClientProfileSkeleton } from "@/components/client/profile/client-profile-skeleton";
 export default function ClientProfile() {
   const { clientProfile, getClientProfile, isLoading, error } =
     useClientStore();
