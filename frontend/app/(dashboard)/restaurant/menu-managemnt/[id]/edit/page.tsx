@@ -1,30 +1,31 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Form } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 import usePlatsStore from "@/store/usePlatsStore";
 import useRestaurantStore from "@/store/useRestaurantStore";
 
-import { GeneralInfoTab } from "./general-info-tab";
-import { ImagesTab } from "./images-tab";
-import { VideosTab } from "./videos-tab";
+import { GeneralInfoTab } from "@/components/restaurant/menu-management/update-plat/general-info-tab";
+import { ImagesTab } from "@/components/restaurant/menu-management/update-plat/images-tab";
+import { VideosTab } from "@/components/restaurant/menu-management/update-plat/videos-tab";
 
 // Form validation schema
 const platFormSchema = z.object({
@@ -46,19 +47,11 @@ const platFormSchema = z.object({
 
 export type PlatFormValues = z.infer<typeof platFormSchema>;
 
-interface UpdatePlatModalProps {
-  platId: string;
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess?: () => void;
-}
+export default function EditPlatPage() {
+  const params = useParams();
+  const router = useRouter();
+  const platId = params.id as string;
 
-export default function UpdatePlatModal({
-  platId,
-  isOpen,
-  onClose,
-  onSuccess,
-}: UpdatePlatModalProps) {
   const { currentPlat, getPlatById, updatePlat, isLoading } = usePlatsStore();
   const { categories, getAllCategories } = useRestaurantStore();
 
@@ -70,6 +63,7 @@ export default function UpdatePlatModal({
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   // Initialize form
   const form = useForm<PlatFormValues>({
@@ -84,10 +78,11 @@ export default function UpdatePlatModal({
     },
   });
 
-  // Fetch plat data and categories when modal opens
+  // Fetch plat data and categories when page loads
   useEffect(() => {
-    if (isOpen && platId) {
-      const fetchData = async () => {
+    const fetchData = async () => {
+      setIsPageLoading(true);
+      try {
         await getAllCategories();
         const plat = await getPlatById(platId);
         if (plat) {
@@ -107,11 +102,21 @@ export default function UpdatePlatModal({
             ingredients: plat.ingredients.join(", "),
             disponible: plat.disponible,
           });
+        } else {
+          toast.error("Plat non trouvé");
+          router.push("/restaurant/menu-management");
         }
-      };
-      fetchData();
-    }
-  }, [isOpen, platId, getPlatById, getAllCategories, form]);
+      } catch (error) {
+        console.error("Error fetching plat:", error);
+        toast.error("Erreur lors du chargement du plat");
+        router.push("/restaurant/menu-management");
+      } finally {
+        setIsPageLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [platId, getPlatById, getAllCategories, form, router]);
 
   // Handle form submission
   const onSubmit = async (values: PlatFormValues) => {
@@ -167,12 +172,13 @@ export default function UpdatePlatModal({
 
       if (success) {
         toast.success("Plat mis à jour avec succès");
-        onClose();
-        if (onSuccess) onSuccess();
 
         // Clean up object URLs
         imagePreviews.forEach(URL.revokeObjectURL);
         videoPreviews.forEach(URL.revokeObjectURL);
+
+        // Redirect back to the plats list
+        router.push("/restaurant/menu-managemnt");
       }
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -182,98 +188,101 @@ export default function UpdatePlatModal({
     }
   };
 
-  // Reset state when modal closes
-  const handleClose = () => {
-    // Clean up object URLs
-    imagePreviews.forEach(URL.revokeObjectURL);
-    videoPreviews.forEach(URL.revokeObjectURL);
-
-    // Reset state
-    setImageFiles([]);
-    setVideoFiles([]);
-    setImagePreviews([]);
-    setVideoPreviews([]);
-    setActiveTab("general");
-
-    onClose();
-  };
+  if (isPageLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2 text-lg">Chargement du plat...</span>
+      </div>
+    );
+  }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Modifier le plat</DialogTitle>
-          <DialogDescription>
+    <div className="container mx-auto py-6 max-w-5xl">
+      <div className="mb-6">
+        <Button variant="outline" asChild>
+          <Link href="/restaurant/menu-management">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Retour à la liste des plats
+          </Link>
+        </Button>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Modifier le plat</CardTitle>
+          <CardDescription>
             Modifiez les informations, les images et les vidéos de votre plat.
-          </DialogDescription>
-        </DialogHeader>
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
+            <TabsList className="grid grid-cols-3 mb-6">
+              <TabsTrigger value="general">Informations générales</TabsTrigger>
+              <TabsTrigger value="images">
+                Images ({existingImages.length + imageFiles.length})
+              </TabsTrigger>
+              <TabsTrigger value="videos">
+                Vidéos ({existingVideos.length + videoFiles.length})
+              </TabsTrigger>
+            </TabsList>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
-          <TabsList className="grid grid-cols-3 mb-4">
-            <TabsTrigger value="general">Informations générales</TabsTrigger>
-            <TabsTrigger value="images">
-              Images ({existingImages.length + imageFiles.length})
-            </TabsTrigger>
-            <TabsTrigger value="videos">
-              Vidéos ({existingVideos.length + videoFiles.length})
-            </TabsTrigger>
-          </TabsList>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)}>
+                <TabsContent value="general">
+                  <GeneralInfoTab form={form} categories={categories} />
+                </TabsContent>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <TabsContent value="general">
-                <GeneralInfoTab form={form} categories={categories} />
-              </TabsContent>
+                <TabsContent value="images">
+                  <ImagesTab
+                    existingImages={existingImages}
+                    setExistingImages={setExistingImages}
+                    imageFiles={imageFiles}
+                    setImageFiles={setImageFiles}
+                    imagePreviews={imagePreviews}
+                    setImagePreviews={setImagePreviews}
+                  />
+                </TabsContent>
 
-              <TabsContent value="images">
-                <ImagesTab
-                  existingImages={existingImages}
-                  setExistingImages={setExistingImages}
-                  imageFiles={imageFiles}
-                  setImageFiles={setImageFiles}
-                  imagePreviews={imagePreviews}
-                  setImagePreviews={setImagePreviews}
-                />
-              </TabsContent>
+                <TabsContent value="videos">
+                  <VideosTab
+                    existingVideos={existingVideos}
+                    setExistingVideos={setExistingVideos}
+                    videoFiles={videoFiles}
+                    setVideoFiles={setVideoFiles}
+                    videoPreviews={videoPreviews}
+                    setVideoPreviews={setVideoPreviews}
+                  />
+                </TabsContent>
 
-              <TabsContent value="videos">
-                <VideosTab
-                  existingVideos={existingVideos}
-                  setExistingVideos={setExistingVideos}
-                  videoFiles={videoFiles}
-                  setVideoFiles={setVideoFiles}
-                  videoPreviews={videoPreviews}
-                  setVideoPreviews={setVideoPreviews}
-                />
-              </TabsContent>
-
-              <DialogFooter className="mt-6">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleClose}
-                  disabled={isSubmitting}
-                >
-                  Annuler
-                </Button>
-                <Button type="submit" disabled={isSubmitting || isLoading}>
-                  {isSubmitting || isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Mise à jour en cours...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="mr-2 h-4 w-4" />
-                      Enregistrer les modifications
-                    </>
-                  )}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+                <div className="mt-6 flex justify-end space-x-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => router.push("/restaurant/menu-management")}
+                    disabled={isSubmitting}
+                  >
+                    Annuler
+                  </Button>
+                  <Button type="submit" disabled={isSubmitting || isLoading}>
+                    {isSubmitting || isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Mise à jour en cours...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="mr-2 h-4 w-4" />
+                        Enregistrer les modifications
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

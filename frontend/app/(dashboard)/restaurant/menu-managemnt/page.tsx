@@ -52,7 +52,6 @@ import {
 } from "@/components/ui/select";
 
 import PlatsTableSkeleton from "@/components/restaurant/menu-management/plats-table-skeleton";
-import UpdatePlatModal from "@/components/restaurant/menu-management/update-plat-modal/index";
 import usePlatsStore from "@/store/usePlatsStore";
 import useRestaurantStore from "@/store/useRestaurantStore";
 
@@ -82,8 +81,6 @@ export default function PlatsTable() {
   const [platToDelete, setPlatToDelete] = useState<string | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [selectedPlatId, setSelectedPlatId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -131,12 +128,6 @@ export default function PlatsTable() {
     } finally {
       setIsDeleting(false);
     }
-  };
-
-  // Open update modal
-  const handleUpdateClick = (platId: string) => {
-    setSelectedPlatId(platId);
-    setIsUpdateModalOpen(true);
   };
 
   // Format price to display with currency
@@ -228,6 +219,7 @@ export default function PlatsTable() {
                           src={
                             process.env.NEXT_PUBLIC_APP_URL + plat.images[0] ||
                             "/placeholder.svg?height=40&width=40" ||
+                            "/placeholder.svg" ||
                             "/placeholder.svg"
                           }
                           alt={plat.nom}
@@ -264,11 +256,13 @@ export default function PlatsTable() {
                               Voir
                             </Link>
                           </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleUpdateClick(plat._id)}
-                          >
-                            <Edit className="h-4 w-4 mr-2" />
-                            Modifier
+                          <DropdownMenuItem asChild>
+                            <Link
+                              href={`/restaurant/menu-managemnt/${plat._id}/edit`}
+                            >
+                              <Edit className="h-4 w-4 mr-2" />
+                              Modifier
+                            </Link>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
@@ -351,19 +345,6 @@ export default function PlatsTable() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Update Plat Modal */}
-      {selectedPlatId && (
-        <UpdatePlatModal
-          platId={selectedPlatId}
-          isOpen={isUpdateModalOpen}
-          onClose={() => {
-            setIsUpdateModalOpen(false);
-            setSelectedPlatId(null);
-          }}
-          onSuccess={() => getAllPlats()}
-        />
-      )}
     </Card>
   );
 }
