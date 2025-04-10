@@ -69,7 +69,7 @@ interface Plat {
   images: string[];
   videos?: string[];
   ingredients: string[];
-  categorie: string | Categorie;
+  categorie: Categorie;
   restaurant: string | Restaurant;
   disponible: boolean;
   createdAt: string;
