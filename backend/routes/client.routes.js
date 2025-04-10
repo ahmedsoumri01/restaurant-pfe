@@ -55,8 +55,16 @@ router.get(
   clientController.getAllDisponiblePlatsOfRestaurant
 );
 // 🔹 Get All Categories
-router.get("/categories", authMiddleware, clientController.getAllCategories);
+router.get(
+  "/plats/categories",
+  authMiddleware,
+  clientController.getAllCategories
+);
 
 // 🔹 Get All Restaurants
-router.get("/restaurants", authMiddleware, clientController.getAllRestaurants);
+router.get(
+  "/plats/restaurants",
+  authMiddleware,
+  clientController.getAllRestaurants
+);
 module.exports = router;

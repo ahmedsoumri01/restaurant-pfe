@@ -254,6 +254,7 @@ exports.getAllDisponiblePlatsOfRestaurant = async (req, res) => {
 // 🔹 Get All Categories
 exports.getAllCategories = async (req, res) => {
   try {
+    console.log("Fetching categories...");
     // Find all categories
     const categories = await Categorie.find();
 
