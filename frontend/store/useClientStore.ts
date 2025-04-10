@@ -117,6 +117,8 @@ interface ClientState {
   clientProfile: User | null;
   avis: Avis[];
   plats: Plat[];
+  categories: Categorie[];
+  restaurants: Restaurant[];
   isLoading: boolean;
   error: string | null;
 
@@ -146,7 +148,9 @@ const useClientStore = create<ClientState>()(
   devtools((set, get) => ({
     clientProfile: null,
     avis: [],
+    categories: [],
     plats: [],
+    restaurants: [],
     isLoading: false,
     error: null,
 
@@ -408,6 +412,52 @@ const useClientStore = create<ClientState>()(
         const errorMessage =
           axiosError.response?.data?.message ||
           "Failed to fetch dishes by restaurant";
+
+        set({ error: errorMessage, isLoading: false });
+        toast.error(errorMessage);
+        return [];
+      }
+    },
+    //getAllCategories
+    getAllCategories: async () => {
+      set({ isLoading: true, error: null });
+      try {
+        const response = await api.get("/client/plats/categories");
+        const { categories } = response.data;
+
+        set({
+          categories,
+          isLoading: false,
+        });
+
+        return categories;
+      } catch (error) {
+        const axiosError = error as AxiosError<{ message: string }>;
+        const errorMessage =
+          axiosError.response?.data?.message || "Failed to fetch categories";
+
+        set({ error: errorMessage, isLoading: false });
+        toast.error(errorMessage);
+        return [];
+      }
+    },
+    //getAllRestaurants
+    getAllRestaurants: async () => {
+      set({ isLoading: true, error: null });
+      try {
+        const response = await api.get("/client/plats/restaurants");
+        const { restaurants } = response.data;
+
+        set({
+          restaurants,
+          isLoading: false,
+        });
+
+        return restaurants;
+      } catch (error) {
+        const axiosError = error as AxiosError<{ message: string }>;
+        const errorMessage =
+          axiosError.response?.data?.message || "Failed to fetch restaurants";
 
         set({ error: errorMessage, isLoading: false });
         toast.error(errorMessage);

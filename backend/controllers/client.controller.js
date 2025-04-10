@@ -250,3 +250,27 @@ exports.getAllDisponiblePlatsOfRestaurant = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
+// 🔹 Get All Categories
+exports.getAllCategories = async (req, res) => {
+  try {
+    // Find all categories
+    const categories = await Categorie.find();
+
+    res.json({ message: "Categories retrieved successfully", categories });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+// 🔹 Get All Restaurants
+exports.getAllRestaurants = async (req, res) => {
+  try {
+    // Find all restaurants
+    const restaurants = await Restaurant.find().populate("categories");
+
+    res.json({ message: "Restaurants retrieved successfully", restaurants });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
