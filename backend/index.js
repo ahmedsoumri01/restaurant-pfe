@@ -7,6 +7,7 @@ const authRoutes = require("./routes/auth.routes");
 const adminRoutes = require("./routes/admin.routes");
 const restaurantRoutes = require("./routes/restaurant.routes");
 const platsRoutes = require("./routes/plats.routes.js");
+const clientRoutes = require("./routes/client.routes.js");
 const { createAdminAccount } = require("./controllers/auth.controller");
 
 // Load environment variables from .env file
@@ -38,6 +39,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/restaurant", restaurantRoutes);
 app.use("/api/plats", platsRoutes);
+app.use("/api/client", clientRoutes);
 
 // Define a simple route for testing
 app.get("/", (req, res) => {
