@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import useClientStore from "@/store/useClientStore";
 type Props = {};
 import Link from "next/link";
-export default function page({}: Props) {
+export default function getAllCategories({}: Props) {
   const { getAllCategories, categories } = useClientStore();
   useEffect(() => {
     const fetchData = async () => {

@@ -12,66 +12,20 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { useRef, useEffect, useState } from "react";
-
-// Mock categories data
-const categories = [
-  {
-    id: "1",
-    name: "Beverage",
-    icon: "/images/categories/beverage.png",
-  },
-  {
-    id: "2",
-    name: "Chicken",
-    icon: "/images/categories/chicken.png",
-  },
-  {
-    id: "3",
-    name: "Pizza",
-    icon: "/images/categories/pizza.png",
-  },
-  {
-    id: "4",
-    name: "Burger",
-    icon: "/images/categories/burger.png",
-  },
-  {
-    id: "5",
-    name: "Pasta",
-    icon: "/images/categories/pasta.png",
-  },
-  {
-    id: "6",
-    name: "Dessert",
-    icon: "/images/categories/dessert.png",
-  },
-  {
-    id: "7",
-    name: "Salad",
-    icon: "/images/categories/salad.png",
-  },
-  {
-    id: "8",
-    name: "Soup",
-    icon: "/images/categories/soup.png",
-  },
-  {
-    id: "9",
-    name: "Seafood",
-    icon: "/images/categories/seafood.png",
-  },
-  {
-    id: "10",
-    name: "Breakfast",
-    icon: "/images/categories/breakfast.png",
-  },
-];
+import useClientStore from "@/store/useClientStore";
 
 export default function CategoriesGrid() {
   const autoplayPlugin = useRef(
     Autoplay({ delay: 4000, stopOnInteraction: true, stopOnMouseEnter: true })
   );
-
+  const { getAllCategories, categories } = useClientStore();
+  useEffect(() => {
+    const fetchData = async () => {
+      await getAllCategories();
+    };
+    fetchData();
+  }, [getAllCategories]);
+  console.log(categories);
   return (
     <div className="space-y-6 px-4 sm:px-6">
       <SectionHeader title="Category" viewAllLink="/client/categories" />
@@ -87,23 +41,27 @@ export default function CategoriesGrid() {
         <CarouselContent className="-ml-4">
           {categories.map((category) => (
             <CarouselItem
-              key={category.id}
-              className={`pl-4   sm:basis-full md:basis-1/2 lg:basis-1/3`}
+              key={category._id}
+              className={`pl-4 mx-auto sm:basis-full md:basis-1/2 lg:basis-1/5`}
             >
-              <Link href={`/categories/${category.id}`}>
-                <Card className="border hover:border-orange-500 transition-colors cursor-pointer h-28">
+              <Link href={`/client/categories/${category._id}`}>
+                <Card className="border hover:border-orange-500 transition-colors cursor-pointer h-32">
                   <CardContent className="flex flex-col items-center justify-center h-full p-4">
-                    <div className="relative w-12 h-12 mb-2">
+                    <div className="relative w-20 h-20 mb-2">
                       <Image
-                        src={category.icon}
-                        alt={category.name}
+                        src={
+                          `${process.env.NEXT_PUBLIC_APP_URL ?? ""}${
+                            category.image
+                          }` || "/images/placeholder.png"
+                        }
+                        alt={category.nom}
                         width={100}
                         height={100}
                         className="object-contain"
                       />
                     </div>
                     <span className="text-center font-medium text-sm">
-                      {category.name}
+                      {category.nom}
                     </span>
                   </CardContent>
                 </Card>
@@ -111,8 +69,12 @@ export default function CategoriesGrid() {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="absolute -left-3 sm:left-0 bg-white/80 hover:bg-white" />
-        <CarouselNext className="absolute -right-3 sm:right-0 bg-white/80 hover:bg-white" />
+        {categories.length != 3 && (
+          <CarouselPrevious className="absolute -left-10 sm:left-0 bg-white/80 hover:bg-white" />
+        )}
+        {categories.length != 3 && (
+          <CarouselNext className="absolute -right-10 sm:right-0 bg-white/80 hover:bg-white" />
+        )}
       </Carousel>
     </div>
   );
