@@ -161,7 +161,7 @@ export default function CreatePlatForm() {
   };
 
   return (
-    <Card className="max-w-3xl mx-auto">
+    <Card className="border-none rounded-none">
       <CardHeader>
         <CardTitle className="text-2xl">Ajouter un nouveau plat</CardTitle>
         <CardDescription>
