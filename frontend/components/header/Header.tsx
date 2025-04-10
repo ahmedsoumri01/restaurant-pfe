@@ -30,7 +30,9 @@ export default function Header({ toggleSidebar, isCollapsed }: HeaderProps) {
               height={70}
               className="h-16 w-16 rounded-full mr-2"
             />
-            <span className="text-white text-lg font-bold">YUMMY FLY</span>
+            <span className="hidden text-white text-lg font-bold md:block">
+              YUMMY FLY
+            </span>
           </Link>
 
           {/* Toggle sidebar button */}
@@ -42,6 +44,7 @@ export default function Header({ toggleSidebar, isCollapsed }: HeaderProps) {
             <Menu size={24} />
             <span className="sr-only">Toggle sidebar</span>
           </Button>
+          <div></div>
         </div>
 
         <div className="flex-1 w-full max-w-[700px] mx-4 relative">

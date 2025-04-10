@@ -27,39 +27,23 @@ export default function AccueilPage() {
   }, [getAllDisponiblePlats, initializeCart]);
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 p-4 md:p-6 max-w-[1400px] mx-auto">
-      {/* Main Content */}
-      <div className="flex-1">
-        {/* Promotions Carousel */}
-        <section className="mb-8">
-          <PromotionCarousel />
-        </section>
-
-        {/* Categories Carousel */}
-        <section className="mb-8">
-          <CategoriesCarousel />
-        </section>
-
-        {/* Popular Dishes Carousel */}
-        <section className="mb-8">
-          <PopularDishesCarousel isLoading={isLoading} />
-        </section>
-
-        {/* Recent Orders Carousel */}
-        <section className="mb-8">
-          <RecentOrdersCarousel />
-        </section>
-
-        {/* Restaurants Carousel */}
-        <section className="mb-8">
-          <RestaurantsCarousel />
-        </section>
+    <>
+      <div className="2xl:flex items-center justify-between w-full">
+        <div className="xl:flex-1 m-4">
+          <div className="mb-8">
+            <PromotionCarousel />
+          </div>
+          <section className="mb-8">
+            <CategoriesCarousel />
+          </section>
+          {/* <section className="mb-8">
+            <PopularDishesCarousel />
+          </section> */}
+        </div>
+        <div className="hidden 2xl:block">
+          <CartSection />
+        </div>
       </div>
-
-      {/* Cart Section */}
-      <div className="w-full md:w-[380px] sticky top-4 h-fit">
-        <CartSection />
-      </div>
-    </div>
+    </>
   );
 }

@@ -52,7 +52,7 @@ export default function UserDropdown({}: Props) {
                 {initials}{" "}
               </AvatarFallback>
             </Avatar>
-            <div className="text-[#747981] font-bold">
+            <div className="hidden text-[#747981] font-bold md:block">
               {" "}
               {user?.nom} {user?.prenom}
             </div>

@@ -1,21 +1,24 @@
 "use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
+import { SectionHeader } from "@/components/client/home/section-header";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
 } from "@/components/ui/carousel";
-import { SectionHeader } from "@/components/client/home/section-header";
+import Autoplay from "embla-carousel-autoplay";
+import { useRef, useEffect, useState } from "react";
 
 // Mock categories data
 const categories = [
   {
     id: "1",
     name: "Beverage",
-    icon: "https://www.southernliving.com/thmb/bCrxpdhq9KTcDsqrjEdqbnV0_V0=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/27793_SnacT_FireQuesadillas_209-1-9423bf482c1f464581040613234d2f27.jpg",
+    icon: "/images/categories/beverage.png",
   },
   {
     id: "2",
@@ -64,30 +67,42 @@ const categories = [
   },
 ];
 
-export default function CategoriesCarousel() {
-  return (
-    <div>
-      <SectionHeader title="Category" viewAllLink="/categories" />
+export default function CategoriesGrid() {
+  const autoplayPlugin = useRef(
+    Autoplay({ delay: 4000, stopOnInteraction: true, stopOnMouseEnter: true })
+  );
 
-      <Carousel className="w-full">
-        <CarouselContent className="-ml-2 md:-ml-4">
+  return (
+    <div className="space-y-6 px-4 sm:px-6">
+      <SectionHeader title="Category" viewAllLink="/categories" />
+      <Carousel
+        plugins={[autoplayPlugin.current]}
+        className="w-full"
+        opts={{
+          align: "start",
+          loop: true,
+          slidesToScroll: 1,
+        }}
+      >
+        <CarouselContent className="-ml-4">
           {categories.map((category) => (
             <CarouselItem
               key={category.id}
-              className="pl-2 md:pl-4 basis-1/3 md:basis-1/4 lg:basis-1/5"
+              className={`pl-4   sm:basis-full md:basis-1/2 lg:basis-1/3`}
             >
               <Link href={`/categories/${category.id}`}>
-                <Card className="border hover:border-orange-500 transition-colors cursor-pointer h-32">
+                <Card className="border hover:border-orange-500 transition-colors cursor-pointer h-28">
                   <CardContent className="flex flex-col items-center justify-center h-full p-4">
-                    <div className="relative w-16 h-16 mb-2">
+                    <div className="relative w-12 h-12 mb-2">
                       <Image
-                        src={`https://www.southernliving.com/thmb/bCrxpdhq9KTcDsqrjEdqbnV0_V0=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/27793_SnacT_FireQuesadillas_209-1-9423bf482c1f464581040613234d2f27.jpg`}
+                        src={category.icon}
                         alt={category.name}
-                        fill
+                        width={100}
+                        height={100}
                         className="object-contain"
                       />
                     </div>
-                    <span className="text-center font-medium">
+                    <span className="text-center font-medium text-sm">
                       {category.name}
                     </span>
                   </CardContent>
@@ -96,6 +111,8 @@ export default function CategoriesCarousel() {
             </CarouselItem>
           ))}
         </CarouselContent>
+        <CarouselPrevious className="absolute -left-3 sm:left-0 bg-white/80 hover:bg-white" />
+        <CarouselNext className="absolute -right-3 sm:right-0 bg-white/80 hover:bg-white" />
       </Carousel>
     </div>
   );
