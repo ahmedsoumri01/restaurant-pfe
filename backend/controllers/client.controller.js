@@ -73,10 +73,11 @@ exports.updateClientProfile = async (req, res) => {
 // 🔹 Delete My Account
 exports.deleteMyAccount = async (req, res) => {
   try {
+    console.log("Deleting account...");
     const userId = req.user.id;
 
     // Find the user
-    const user = await User.findById(userId);
+    const user = await User.findOneAndDelete({ _id: userId });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -85,9 +86,6 @@ exports.deleteMyAccount = async (req, res) => {
     if (user.photoProfil) {
       deleteFile(user.photoProfil);
     }
-
-    // Delete the user
-    await user.remove();
 
     res.json({ message: "Account deleted successfully" });
   } catch (error) {
