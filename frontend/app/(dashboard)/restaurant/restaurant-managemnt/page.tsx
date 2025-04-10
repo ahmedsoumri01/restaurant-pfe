@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import useRestaurantStore from "@/store/useRestaurantStore";
-
+import usePlatsStore from "@/store/usePlatsStore";
 export default function RestaurantPage() {
   const {
     ownerProfile,
@@ -18,13 +18,13 @@ export default function RestaurantPage() {
     getOwnerProfile,
     checkRestaurantDataCompleted,
     getAllCategories,
-    isLoading,
     error,
   } = useRestaurantStore();
+  const { getAllPlats, isLoading, plats } = usePlatsStore();
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [hasRestaurant, setHasRestaurant] = useState(false);
-  console.log({ ownerProfile, restaurant, categories });
+  console.log({ ownerProfile, restaurant, categories, plats });
   useEffect(() => {
     const loadData = async () => {
       await getOwnerProfile();
@@ -33,6 +33,7 @@ export default function RestaurantPage() {
 
       if (hasCompletedRestaurant) {
         await getAllCategories();
+        await getAllPlats();
       }
 
       setIsDataLoaded(true);
@@ -44,7 +45,7 @@ export default function RestaurantPage() {
   if (!isDataLoaded) {
     return <RestaurantPageSkeleton />;
   }
-
+  console.log({ ownerProfile, restaurant, categories });
   if (!hasRestaurant || restaurant === null) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] p-6 text-center">
@@ -203,25 +204,27 @@ export default function RestaurantPage() {
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">Nos plats</h2>
             <Button asChild>
-              <Link href="/restaurant/restaurant-managemnt/dishes">
-                Gérer les plats
-              </Link>
+              <Link href="/restaurant/menu-managemnt">Gérer les plats</Link>
             </Button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {mockDishes.map((dish) => (
-              <Card key={dish.id} className="overflow-hidden">
+            {plats.map((dish) => (
+              <Card key={dish._id} className="overflow-hidden">
                 <div className="aspect-video relative">
                   <Image
-                    src={dish.image || "/placeholder.svg"}
-                    alt={dish.name}
+                    src={
+                      process.env.NEXT_PUBLIC_APP_URL + dish.images[0] ||
+                      "/placeholder.svg"
+                    }
+                    alt={dish.nom}
                     fill
                     className="object-cover"
                   />
                 </div>
                 <CardContent className="p-4">
-                  <h3 className="font-semibold">{dish.name}</h3>
-                  <p className="text-primary font-medium">{dish.price}</p>
+                  <h3 className="font-semibold">{dish.nom}</h3>
+
+                  <p className="text-primary font-medium">{dish.prix} DT</p>
                 </CardContent>
               </Card>
             ))}
@@ -233,7 +236,7 @@ export default function RestaurantPage() {
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold">Catégories</h2>
             <Button asChild>
-              <Link href="/restaurant/restaurant-managemnt/categories">
+              <Link href="/restaurant/categories-management">
                 Gérer les catégories
               </Link>
             </Button>
@@ -245,7 +248,7 @@ export default function RestaurantPage() {
                   <div className="aspect-video relative">
                     <Image
                       src={
-                        category.image ||
+                        process.env.NEXT_PUBLIC_APP_URL + category.image ||
                         "/placeholder.svg?height=200&width=400"
                       }
                       alt={category.nom}
