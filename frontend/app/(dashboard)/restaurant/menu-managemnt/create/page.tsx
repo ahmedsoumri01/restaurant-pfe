@@ -8,7 +8,7 @@ import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { ImagePlus, Loader2, Save, X } from "lucide-react";
+import { ImagePlus, Loader2, Save, Video, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -31,6 +30,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -38,6 +39,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import usePlatsStore from "@/store/usePlatsStore";
 import useRestaurantStore from "@/store/useRestaurantStore";
 
@@ -56,18 +58,23 @@ const platFormSchema = z.object({
     required_error: "Veuillez sélectionner une catégorie",
   }),
   ingredients: z.string().optional(),
+  disponible: z.boolean().default(true),
 });
 
 export default function CreatePlatForm() {
   const router = useRouter();
   const { createPlat, isLoading } = usePlatsStore();
   const { categories, getAllCategories } = useRestaurantStore();
+
+  const [activeTab, setActiveTab] = useState("general");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [videoFiles, setVideoFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [videoPreviews, setVideoPreviews] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  console.log("categories", categories);
+
   // Initialize form
-  const form = useForm<z.infer<typeof platFormSchema>>({
+  const form = useForm<PlatFormValues>({
     resolver: zodResolver(platFormSchema),
     defaultValues: {
       nom: "",
@@ -75,8 +82,10 @@ export default function CreatePlatForm() {
       prix: 0,
       categorie: "",
       ingredients: "",
+      disponible: true,
     },
   });
+
   const fetchCategories = async () => {
     try {
       await getAllCategories();
@@ -88,6 +97,7 @@ export default function CreatePlatForm() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
   // Handle image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -102,6 +112,20 @@ export default function CreatePlatForm() {
     }
   };
 
+  // Handle video upload
+  const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files);
+
+      // Create preview URLs for the new files
+      const newPreviewUrls = newFiles.map((file) => URL.createObjectURL(file));
+
+      // Update state with new files and preview URLs
+      setVideoFiles((prev) => [...prev, ...newFiles]);
+      setVideoPreviews((prev) => [...prev, ...newPreviewUrls]);
+    }
+  };
+
   // Remove image from preview
   const removeImage = (index: number) => {
     // Revoke the object URL to avoid memory leaks
@@ -112,16 +136,24 @@ export default function CreatePlatForm() {
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Handle form submission
-  const onSubmit = async (values: z.infer<typeof platFormSchema>) => {
+  // Remove video from preview
+  const removeVideo = (index: number) => {
+    // Revoke the object URL to avoid memory leaks
+    URL.revokeObjectURL(videoPreviews[index]);
+
+    // Remove the video and its preview URL from state
+    setVideoFiles((prev) => prev.filter((_, i) => i !== index));
+    setVideoPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const onSubmit = async (values: any) => {
     // Validate that at least one image is uploaded
     if (imageFiles.length === 0) {
       toast.error("Veuillez télécharger au moins une image");
+      setActiveTab("images");
       return;
     }
-
     setIsSubmitting(true);
-
     try {
       // Create FormData object for submission
       const formData = new FormData();
@@ -129,27 +161,36 @@ export default function CreatePlatForm() {
       formData.append("description", values.description);
       formData.append("prix", values.prix.toString());
       formData.append("categorie", values.categorie);
+      formData.append("disponible", values.disponible.toString());
 
       // Parse and append ingredients as array
       if (values.ingredients) {
         const ingredientsArray = values.ingredients
           .split(",")
           .map((item) => item.trim());
-        ingredientsArray.forEach((ingredient, index) => {
-          formData.append(`ingredients[${index}]`, ingredient);
-        });
+        // Change to match backend expectations
+        formData.append("ingredients", JSON.stringify(ingredientsArray));
       }
 
-      // Append all images
+      // Append all images - using "images" as the field name to match backend expectations
       imageFiles.forEach((image) => {
         formData.append("images", image);
       });
 
+      // Append all videos - using "videos" as the field name to match backend expectations
+      videoFiles.forEach((video) => {
+        formData.append("videos", video);
+      });
+
+      console.log("Form data:", formData);
+
       // Submit the form data
       const success = await createPlat(formData);
-
       if (success) {
         toast.success("Plat créé avec succès");
+        // Clean up object URLs
+        imagePreviews.forEach(URL.revokeObjectURL);
+        videoPreviews.forEach(URL.revokeObjectURL);
         router.push("/restaurant/menu-managemnt");
       }
     } catch (error) {
@@ -165,202 +206,325 @@ export default function CreatePlatForm() {
       <CardHeader>
         <CardTitle className="text-2xl">Ajouter un nouveau plat</CardTitle>
         <CardDescription>
-          Créez un nouveau plat pour votre menu. Ajoutez des images, une
-          description et des ingrédients.
+          Créez un nouveau plat pour votre menu. Ajoutez des images, des vidéos,
+          une description et des ingrédients.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Plat Name */}
-              <FormField
-                control={form.control}
-                name="nom"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nom du plat</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Couscous Royal" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
+          <TabsList className="grid grid-cols-3 mb-6">
+            <TabsTrigger value="general">Informations générales</TabsTrigger>
+            <TabsTrigger value="images">
+              Images ({imageFiles.length})
+            </TabsTrigger>
+            <TabsTrigger value="videos">
+              Vidéos ({videoFiles.length})
+            </TabsTrigger>
+          </TabsList>
 
-              {/* Price */}
-              <FormField
-                control={form.control}
-                name="prix"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Prix</FormLabel>
-                    <FormControl>
-                      <div className="flex items-center">
-                        <Input type="number" step="0.01" min="0" {...field} />
-                        <span className="ml-2">€</span>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Category */}
-              <FormField
-                control={form.control}
-                name="categorie"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Catégorie</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionnez une catégorie" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category._id} value={category._id}>
-                            {category.nom}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Ingredients */}
-              <FormField
-                control={form.control}
-                name="ingredients"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Ingrédients</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Tomate, Oignon, Poulet..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Séparez les ingrédients par des virgules
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Description */}
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem className="md:col-span-2">
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Décrivez votre plat, sa préparation, ses saveurs..."
-                        className="min-h-32"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Image Upload */}
-              <div className="md:col-span-2">
-                <FormLabel>Images du plat</FormLabel>
-                <div className="mt-2 border-2 border-dashed rounded-lg p-6 text-center">
-                  <label
-                    htmlFor="image-upload"
-                    className="flex flex-col items-center justify-center cursor-pointer"
-                  >
-                    <ImagePlus className="h-12 w-12 text-muted-foreground mb-2" />
-                    <span className="text-sm font-medium mb-1">
-                      Cliquez pour télécharger des images
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      PNG, JPG, JPEG jusqu&apos;à 5MB (minimum 1 image)
-                    </span>
-                    <input
-                      id="image-upload"
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                      onChange={handleImageUpload}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <TabsContent value="general">
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Plat Name */}
+                    <FormField
+                      control={form.control}
+                      name="nom"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nom du plat</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Couscous Royal" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </label>
-                </div>
-                <FormDescription className="mt-2">
-                  Téléchargez des photos de votre plat pour attirer vos clients.
-                </FormDescription>
 
-                {/* Image Preview Gallery */}
-                {imagePreviews.length > 0 && (
-                  <div className="mt-4">
-                    <h4 className="text-sm font-medium mb-2">
-                      Aperçu des images ({imagePreviews.length})
-                    </h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                      {imagePreviews.map((url, index) => (
-                        <div key={index} className="relative group">
-                          <div className="aspect-square relative rounded-md overflow-hidden border">
-                            <Image
-                              src={url || "/placeholder.svg"}
-                              alt={`Preview ${index + 1}`}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            className="absolute top-1 right-1 bg-black/70 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    {/* Price */}
+                    <FormField
+                      control={form.control}
+                      name="prix"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Prix</FormLabel>
+                          <FormControl>
+                            <div className="flex items-center">
+                              <Input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                {...field}
+                              />
+                              <span className="ml-2">€</span>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Category */}
+                    <FormField
+                      control={form.control}
+                      name="categorie"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Catégorie</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
                           >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ))}
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Sélectionnez une catégorie" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {categories.map((category) => (
+                                <SelectItem
+                                  key={category._id}
+                                  value={category._id}
+                                >
+                                  {category.nom}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Availability */}
+                    <FormField
+                      control={form.control}
+                      name="disponible"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                          <div className="space-y-0.5">
+                            <FormLabel>Disponibilité</FormLabel>
+                            <FormDescription>
+                              Indiquez si ce plat est disponible à la commande
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Ingredients */}
+                    <FormField
+                      control={form.control}
+                      name="ingredients"
+                      render={({ field }) => (
+                        <FormItem className="md:col-span-2">
+                          <FormLabel>Ingrédients</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Tomate, Oignon, Poulet..."
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Séparez les ingrédients par des virgules
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Description */}
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem className="md:col-span-2">
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Décrivez votre plat, sa préparation, ses saveurs..."
+                              className="min-h-32"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="images">
+                <div className="space-y-6">
+                  {/* New Images Upload */}
+                  <div>
+                    <h3 className="text-lg font-medium mb-2">
+                      Ajouter des images
+                    </h3>
+                    <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                      <label
+                        htmlFor="image-upload"
+                        className="flex flex-col items-center justify-center cursor-pointer"
+                      >
+                        <ImagePlus className="h-12 w-12 text-muted-foreground mb-2" />
+                        <span className="text-sm font-medium mb-1">
+                          Cliquez pour télécharger des images
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          PNG, JPG, JPEG jusqu&apos;à 5MB (minimum 1 image)
+                        </span>
+                        <input
+                          id="image-upload"
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          className="hidden"
+                          onChange={handleImageUpload}
+                        />
+                      </label>
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
 
-            <CardFooter className="px-0 pt-6 flex flex-col sm:flex-row gap-4 justify-end">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.back()}
-                disabled={isSubmitting}
-              >
-                Annuler
-              </Button>
-              <Button type="submit" disabled={isSubmitting || isLoading}>
-                {isSubmitting || isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Création en cours...
-                  </>
-                ) : (
-                  <>
-                    <Save className="mr-2 h-4 w-4" />
-                    Créer le plat
-                  </>
-                )}
-              </Button>
-            </CardFooter>
-          </form>
-        </Form>
+                  {/* Image Preview Gallery */}
+                  {imagePreviews.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-medium mb-2">
+                        Images à ajouter ({imagePreviews.length})
+                      </h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        {imagePreviews.map((url, index) => (
+                          <div
+                            key={`image-${index}`}
+                            className="relative group"
+                          >
+                            <div className="aspect-square relative rounded-md overflow-hidden border">
+                              <Image
+                                src={url || "/placeholder.svg"}
+                                alt={`Nouvelle image ${index + 1}`}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                            <Badge className="absolute top-1 left-1 bg-green-500">
+                              Nouveau
+                            </Badge>
+                            <button
+                              type="button"
+                              onClick={() => removeImage(index)}
+                              className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="videos">
+                <div className="space-y-6">
+                  {/* New Videos Upload */}
+                  <div>
+                    <h3 className="text-lg font-medium mb-2">
+                      Ajouter des vidéos
+                    </h3>
+                    <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                      <label
+                        htmlFor="video-upload"
+                        className="flex flex-col items-center justify-center cursor-pointer"
+                      >
+                        <Video className="h-12 w-12 text-muted-foreground mb-2" />
+                        <span className="text-sm font-medium mb-1">
+                          Cliquez pour télécharger des vidéos
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          MP4, MOV, AVI jusqu&apos;à 50MB
+                        </span>
+                        <input
+                          id="video-upload"
+                          type="file"
+                          accept="video/*"
+                          multiple
+                          className="hidden"
+                          onChange={handleVideoUpload}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Video Preview Gallery */}
+                  {videoPreviews.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-medium mb-2">
+                        Vidéos à ajouter ({videoPreviews.length})
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        {videoPreviews.map((url, index) => (
+                          <div
+                            key={`video-${index}`}
+                            className="relative group"
+                          >
+                            <div className="aspect-video relative rounded-md overflow-hidden border bg-gray-100">
+                              <video
+                                src={url}
+                                controls
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <Badge className="absolute top-1 left-1 bg-green-500">
+                              Nouveau
+                            </Badge>
+                            <button
+                              type="button"
+                              onClick={() => removeVideo(index)}
+                              className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </TabsContent>
+
+              <div className="mt-6 flex justify-end space-x-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.back()}
+                  disabled={isSubmitting}
+                >
+                  Annuler
+                </Button>
+                <Button type="submit" disabled={isSubmitting || isLoading}>
+                  {isSubmitting || isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Création en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
+                      Créer le plat
+                    </>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </Tabs>
       </CardContent>
     </Card>
   );

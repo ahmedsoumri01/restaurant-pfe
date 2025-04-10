@@ -9,7 +9,6 @@ exports.addPlat = async (req, res) => {
   try {
     const userId = req.user.id;
     const { nom, description, prix, ingredients, categorie } = req.body;
-
     // Find the restaurant owned by the user
     const restaurant = await Restaurant.findOne({ proprietaire: userId });
     if (!restaurant) {
