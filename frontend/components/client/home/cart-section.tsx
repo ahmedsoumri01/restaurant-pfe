@@ -28,20 +28,22 @@ export default function CartSection() {
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-[420px] bg-[#fff2e7] border-[#fc8019] ">
       <CardHeader className="pb-3">
-        <CardTitle>Your Cart</CardTitle>
+        <CardTitle className="text-[#fc8019] font-bold text-2xl">
+          Your Cart
+        </CardTitle>
       </CardHeader>
 
       <CardContent className="space-y-4">
         {/* Address Section */}
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <h3 className="text-sm font-medium text-gray-500">Your Address</h3>
+            <h3 className="text-sm font-medium text-[#fc8019]">Your Address</h3>
             <Button
               variant="outline"
               size="sm"
-              className="h-8 text-orange-500 border-orange-500 hover:bg-orange-50"
+              className="h-8 text-orange-500 border-orange-500 bg-transparent cursor-pointer hover:bg-orange-500 hover:text-white transition-colors"
             >
               Change
             </Button>
@@ -50,7 +52,7 @@ export default function CartSection() {
           <div className="flex items-start gap-2">
             <MapPin className="h-5 w-5 text-orange-500 mt-0.5" />
             <div>
-              <p className="font-medium">{address}</p>
+              <p className="font-bold">{address}</p>
               <p className="text-sm text-gray-500">
                 Lorem ipsum dolor sit amet, consectetur elit, sed do eiusmod
                 tempor incididunt.
@@ -59,10 +61,18 @@ export default function CartSection() {
           </div>
 
           <div className="flex gap-2 mt-2">
-            <Button variant="outline" size="sm" className="flex-1 h-10">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 h-10 bg-[#fc8019] text-white font-bold cursor-pointer"
+            >
               Add Details
             </Button>
-            <Button variant="outline" size="sm" className="flex-1 h-10">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 h-10 bg-[#fc8019] text-white font-bold cursor-pointer"
+            >
               Add Note
             </Button>
           </div>
