@@ -88,12 +88,13 @@ interface Commande {
 }
 
 // Define Profile Update interface
-interface ProfileUpdate {
+interface ClientProfileUpdate {
   nom?: string;
   prenom?: string;
   email?: string;
   telephone?: string;
   adresse?: string;
+  photoProfil?: string;
 }
 
 // Define Avis Creation interface
@@ -122,8 +123,7 @@ interface ClientState {
   // Profile Actions
   getClientProfile: () => Promise<User | null>;
   updateClientProfile: (
-    data: ProfileUpdate,
-    profileImage?: File
+    data: ClientProfileUpdate | FormData
   ) => Promise<boolean>;
   deleteClientAccount: () => Promise<boolean>;
 
@@ -176,35 +176,18 @@ const useClientStore = create<ClientState>()(
     },
 
     // Update Client Profile
-    updateClientProfile: async (data: ProfileUpdate, profileImage?: File) => {
+    updateClientProfile: async (data: ClientProfileUpdate | FormData) => {
       set({ isLoading: true, error: null });
       try {
-        // Create FormData if there's a profile image
-        let response;
+        // Check if data is FormData for multipart/form-data request (with image)
+        const isFormData = data instanceof FormData;
 
-        if (profileImage) {
-          const formData = new FormData();
+        // Configure request headers based on data type
+        const config = isFormData
+          ? { headers: { "Content-Type": "multipart/form-data" } }
+          : undefined;
 
-          // Append profile data
-          Object.entries(data).forEach(([key, value]) => {
-            if (value !== undefined) {
-              formData.append(key, value.toString());
-            }
-          });
-
-          // Append profile image
-          formData.append("profileImage", profileImage);
-
-          response = await api.put("/client/update-profile", formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          });
-        } else {
-          // Regular JSON request if no image
-          response = await api.put("/client/update-profile", data);
-        }
-
+        const response = await api.put("/client/update-profile", data, config);
         const { user } = response.data;
 
         set({
