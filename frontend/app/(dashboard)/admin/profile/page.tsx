@@ -11,10 +11,10 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import useAdminStore from "@/store/useAdminStore";
-import { ProfileCard } from "@/components/admin/profile-card";
-import { UpdateProfileModal } from "@/components/admin/update-profile-modal";
-import { ChangePasswordModal } from "@/components/admin/change-password-modal";
-import { AdminProfileSkeleton } from "@/components/admin/admin-profile-skeleton";
+import { ProfileCard } from "@/components/admin/profile/profile-card";
+import { UpdateProfileModal } from "@/components/admin/profile/update-profile-modal";
+import { ChangePasswordModal } from "@/components/admin/profile/change-password-modal";
+import { AdminProfileSkeleton } from "@/components/admin/profile/admin-profile-skeleton";
 
 export default function AdminProfile() {
   const { adminProfile, getAdminProfile, isLoading, error } = useAdminStore();
