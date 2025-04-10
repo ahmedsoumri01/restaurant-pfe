@@ -74,7 +74,7 @@ export default function CategoriesGrid() {
 
   return (
     <div className="space-y-6 px-4 sm:px-6">
-      <SectionHeader title="Category" viewAllLink="/categories" />
+      <SectionHeader title="Category" viewAllLink="/client/categories" />
       <Carousel
         plugins={[autoplayPlugin.current]}
         className="w-full"

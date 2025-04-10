@@ -140,6 +140,8 @@ interface ClientState {
   getAllDisponiblePlatsOfCategorie: (categorieId: string) => Promise<Plat[]>;
   getAllDisponiblePlatsOfRestaurant: (restaurantId: string) => Promise<Plat[]>;
 
+  getAllCategories: () => Promise<Categorie[]>;
+  getAllRestaurants: () => Promise<Restaurant[]>;
   // Utility Actions
   clearError: () => void;
 }
