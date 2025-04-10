@@ -12,7 +12,7 @@ router.post(
   "/",
   authMiddleware,
   restaurantMiddleware,
-  uploadMiddleware.uploadMixedMedia, // Middleware to handle mixed media uploads (images and videos)
+  uploadMiddleware.uploadPlatMedia, // Middleware to handle mixed media uploads (images and videos)
   platController.addPlat
 );
 
@@ -45,7 +45,7 @@ router.put(
   "/:platId",
   authMiddleware,
   restaurantMiddleware,
-  uploadMiddleware.uploadMixedMedia, // Middleware to handle mixed media uploads (images and videos)
+  uploadMiddleware.uploadPlatMedia, // Middleware to handle mixed media uploads (images and videos)
   platController.updatePlat
 );
 

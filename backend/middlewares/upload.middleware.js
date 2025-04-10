@@ -283,7 +283,116 @@ exports.uploadMixedMedia = (req, res, next) => {
     next();
   });
 };
+// Add this new middleware to handle uploads for both create and update of plats
+exports.uploadPlatMedia = (req, res, next) => {
+  // Configure storage settings
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "./uploads/multiple");
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      const filePrefix = file.mimetype.startsWith("image/") ? "image" : "video";
+      cb(
+        null,
+        filePrefix + "-" + uniqueSuffix + path.extname(file.originalname)
+      );
+    },
+  });
 
+  // File filter function
+  const fileFilter = (req, file, cb) => {
+    if (
+      file.mimetype.startsWith("image/") ||
+      file.mimetype.startsWith("video/")
+    ) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image and video files are allowed!"), false);
+    }
+  };
+
+  // Create multer instance with appropriate settings
+  const upload = multer({
+    storage: storage,
+    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB for videos
+    fileFilter: fileFilter,
+  }).fields([
+    { name: "images", maxCount: 5 }, // For create
+    { name: "videos", maxCount: 3 }, // For create
+    { name: "newImages", maxCount: 5 }, // For update
+    { name: "newVideos", maxCount: 3 }, // For update
+  ]);
+
+  // Process the uploads
+  upload(req, res, function (err) {
+    if (err) {
+      if (err instanceof multer.MulterError) {
+        return res.status(400).json({
+          success: false,
+          message: `Upload error: ${err.message}`,
+        });
+      } else {
+        return res.status(500).json({
+          success: false,
+          message: `Error: ${err.message}`,
+        });
+      }
+    }
+
+    // Process uploaded files
+    if (req.files) {
+      // Process images for create operation
+      if (req.files.images && req.files.images.length > 0) {
+        const imagePaths = req.files.images.map(
+          (file) => `/uploads/multiple/${file.filename}`
+        );
+        req.body.imagePaths = imagePaths;
+      }
+
+      // Process videos for create operation
+      if (req.files.videos && req.files.videos.length > 0) {
+        const videoPaths = req.files.videos.map(
+          (file) => `/uploads/multiple/${file.filename}`
+        );
+        req.body.videoPaths = videoPaths;
+      }
+
+      // Process images for update operation
+      if (req.files.newImages && req.files.newImages.length > 0) {
+        const newImagePaths = req.files.newImages.map(
+          (file) => `/uploads/multiple/${file.filename}`
+        );
+        req.body.newImagePaths = newImagePaths;
+      }
+
+      // Process videos for update operation
+      if (req.files.newVideos && req.files.newVideos.length > 0) {
+        const newVideoPaths = req.files.newVideos.map(
+          (file) => `/uploads/multiple/${file.filename}`
+        );
+        req.body.newVideoPaths = newVideoPaths;
+      }
+    }
+
+    // Process existing images/videos for update
+    if (req.body.existingImages) {
+      // Convert existingImages to an array if it's not already
+      if (!Array.isArray(req.body.existingImages)) {
+        req.body.existingImages = [req.body.existingImages];
+      }
+    }
+
+    if (req.body.existingVideos) {
+      // Convert existingVideos to an array if it's not already
+      if (!Array.isArray(req.body.existingVideos)) {
+        req.body.existingVideos = [req.body.existingVideos];
+      }
+    }
+
+    next();
+  });
+};
 // Helper function to delete a file
 exports.deleteFile = (filePath) => {
   const fullPath = path.join(__dirname, "..", filePath);

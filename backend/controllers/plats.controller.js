@@ -110,7 +110,8 @@ exports.getPlatById = async (req, res) => {
 exports.updatePlat = async (req, res) => {
   try {
     const { platId } = req.params;
-    const { nom, description, prix, ingredients, categorie } = req.body;
+    const { nom, description, prix, ingredients, categorie, disponible } =
+      req.body;
 
     // Find the plat by ID
     const plat = await Plat.findById(platId);
@@ -118,30 +119,75 @@ exports.updatePlat = async (req, res) => {
       return res.status(404).json({ message: "Plat not found" });
     }
 
-    // Handle new images and videos
-    const newImages = req.body.newImagePaths || [];
-    const newVideos = req.body.videoPaths || [];
+    // Handle media updates
 
-    // Delete old files if new ones are uploaded
-    if (newImages.length > 0 && plat.images.length > 0) {
-      plat.images.forEach((image) => deleteFile(image));
-      plat.images = newImages;
+    // 1. Process new images
+    if (req.body.newImagePaths && req.body.newImagePaths.length > 0) {
+      // If existingImages is provided, replace current images with these
+      if (req.body.existingImages) {
+        // Delete images that aren't in existingImages
+        const imagesToDelete = plat.images.filter(
+          (image) => !req.body.existingImages.includes(image)
+        );
+        imagesToDelete.forEach((image) => deleteFile(image));
+
+        // Set images to be existingImages + newImages
+        plat.images = [...req.body.existingImages, ...req.body.newImagePaths];
+      } else {
+        // If no existingImages specified, just add new ones
+        plat.images = [...plat.images, ...req.body.newImagePaths];
+      }
+    } else if (req.body.existingImages) {
+      // If only existingImages provided (no new uploads)
+      // Delete images that aren't in existingImages
+      const imagesToDelete = plat.images.filter(
+        (image) => !req.body.existingImages.includes(image)
+      );
+      imagesToDelete.forEach((image) => deleteFile(image));
+
+      // Update the plat's images with the existingImages
+      plat.images = req.body.existingImages;
     }
 
-    if (newVideos.length > 0 && plat.videos.length > 0) {
-      plat.videos.forEach((video) => deleteFile(video));
-      plat.videos = newVideos;
+    // 2. Process new videos
+    if (req.body.newVideoPaths && req.body.newVideoPaths.length > 0) {
+      // If existingVideos is provided, replace current videos with these
+      if (req.body.existingVideos) {
+        // Delete videos that aren't in existingVideos
+        const videosToDelete = plat.videos.filter(
+          (video) => !req.body.existingVideos.includes(video)
+        );
+        videosToDelete.forEach((video) => deleteFile(video));
+
+        // Set videos to be existingVideos + newVideos
+        plat.videos = [...req.body.existingVideos, ...req.body.newVideoPaths];
+      } else {
+        // If no existingVideos specified, just add new ones
+        plat.videos = [...plat.videos, ...req.body.newVideoPaths];
+      }
+    } else if (req.body.existingVideos) {
+      // If only existingVideos provided (no new uploads)
+      // Delete videos that aren't in existingVideos
+      const videosToDelete = plat.videos.filter(
+        (video) => !req.body.existingVideos.includes(video)
+      );
+      videosToDelete.forEach((video) => deleteFile(video));
+
+      // Update the plat's videos with the existingVideos
+      plat.videos = req.body.existingVideos;
     }
 
     // Update other fields
     plat.nom = nom || plat.nom;
     plat.description = description || plat.description;
     plat.prix = prix || plat.prix;
-    plat.ingredients = ingredients || plat.ingredients;
+    plat.ingredients = Array.isArray(ingredients)
+      ? ingredients
+      : plat.ingredients;
     plat.categorie = categorie || plat.categorie;
+    plat.disponible = disponible !== undefined ? disponible : plat.disponible;
 
     await plat.save();
-
     res.json({ message: "Plat updated successfully", plat });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });

@@ -166,7 +166,7 @@ export default function EditPlatPage() {
       videoFiles.forEach((video) => {
         formData.append("newVideos", video);
       });
-
+      console.log("FormData:", formData);
       // Submit the form data
       const success = await updatePlat(platId, formData);
 
