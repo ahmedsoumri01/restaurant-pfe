@@ -117,6 +117,7 @@ interface ClientState {
   clientProfile: User | null;
   avis: Avis[];
   plats: Plat[];
+  plat: Plat | null;
   categories: Categorie[];
   restaurants: Restaurant[];
   isLoading: boolean;
@@ -142,6 +143,7 @@ interface ClientState {
 
   getAllCategories: () => Promise<Categorie[]>;
   getAllRestaurants: () => Promise<Restaurant[]>;
+  getPlatById: (platId: string) => Promise<Plat | null>;
   // Utility Actions
   clearError: () => void;
 }
@@ -466,7 +468,103 @@ const useClientStore = create<ClientState>()(
         return [];
       }
     },
+    //getPlatById
+    getPlatById: async (platId: string) => {
+      set({ isLoading: true, error: null });
+      try {
+        console.log("platId", platId);
+        const response = await api.get(`/client/plats/${platId}`);
+        const { plat } = response.data;
 
+        set({
+          plat,
+          isLoading: false,
+        });
+
+        return plat;
+      } catch (error) {
+        const axiosError = error as AxiosError<{ message: string }>;
+        const errorMessage =
+          axiosError.response?.data?.message || "Failed to fetch plat";
+
+        set({ error: errorMessage, isLoading: false });
+        toast.error(errorMessage);
+        return null;
+      }
+    },
+
+    //makeComment
+    makeComment: async (platId: string, comment: string) => {
+      set({ isLoading: true, error: null });
+      try {
+        const response = await api.post(`/client/plats/${platId}/comment`, {
+          comment,
+        });
+        const { plat } = response.data;
+
+        set({
+          plat,
+          isLoading: false,
+        });
+
+        return plat;
+      } catch (error) {
+        const axiosError = error as AxiosError<{ message: string }>;
+        const errorMessage =
+          axiosError.response?.data?.message || "Failed to fetch plat";
+
+        set({ error: errorMessage, isLoading: false });
+        toast.error(errorMessage);
+        return null;
+      }
+    },
+    //likePlat
+    likePlat: async (platId: string) => {
+      set({ isLoading: true, error: null });
+      try {
+        const response = await api.post(`/client/plats/${platId}/like`);
+        const { plat } = response.data;
+
+        set({
+          plat,
+          isLoading: false,
+        });
+
+        return plat;
+      } catch (error) {
+        const axiosError = error as AxiosError<{ message: string }>;
+        const errorMessage =
+          axiosError.response?.data?.message || "Failed to fetch plat";
+
+        set({ error: errorMessage, isLoading: false });
+        toast.error(errorMessage);
+        return null;
+      }
+    },
+
+    //getAllCommentsOnPlat
+    getAllCommentsOnPlat: async (platId: string) => {
+      set({ isLoading: true, error: null });
+      try {
+        const response = await api.get(`/client/plats/${platId}/comments`);
+        const { comments } = response.data;
+
+        set({
+          plat: { ...get().plat, comments },
+          isLoading: false,
+        });
+
+        return comments;
+      } catch (error) {
+        const axiosError = error as AxiosError<{ message: string }>;
+        const errorMessage =
+          axiosError.response?.data?.message || "Failed to fetch plat";
+
+        set({ error: errorMessage, isLoading: false });
+        toast.error(errorMessage);
+        return null;
+      }
+    },
     // Clear error
     clearError: () => set({ error: null }),
   }))

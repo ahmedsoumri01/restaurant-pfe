@@ -147,12 +147,27 @@ export const adminSidebarConfig: SidebarConfig = {
 export const clientSidebarConfig: SidebarConfig = {
   mainMenu: [
     {
-      title: "Dashboard",
+      title: "acceuil",
       path: "/client",
       icon: LayoutDashboard,
     },
     {
-      title: "Orders",
+      title: "ALL categories",
+      path: "/client/categories",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "ALL plats",
+      path: "/client/plats/all",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "ALL restaurants",
+      path: "/client/restaurants/all",
+      icon: LayoutDashboard,
+    },
+    {
+      title: "My Orders",
       path: "/client/orders",
       icon: FileText,
     },

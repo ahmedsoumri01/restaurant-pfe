@@ -6,6 +6,17 @@ import { useEffect } from "react";
 import Link from "next/link";
 type Props = {};
 
-export default function page({}: Props) {
+export default function platDetailsPage({}: Props) {
+  const params = useParams();
+  const { id } = params as { id: string };
+  const { getPlatById, plat } = useClientStore();
+  const fetchData = async () => {
+    await getPlatById(id);
+  };
+  useEffect(() => {
+    fetchData();
+  }, [id, getPlatById]);
+  console.log("plat", plat);
+  if (!plat) return <div>Loading...</div>;
   return <div>here the details of the plat</div>;
 }
