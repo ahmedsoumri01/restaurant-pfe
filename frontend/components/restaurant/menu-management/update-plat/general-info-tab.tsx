@@ -17,7 +17,6 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import type { UseFormReturn } from "react-hook-form";
-import type { PlatFormValues } from "./index";
 
 interface Category {
   _id: string;
@@ -28,7 +27,7 @@ interface Category {
 }
 
 interface GeneralInfoTabProps {
-  form: UseFormReturn<PlatFormValues>;
+  form: UseFormReturn<any>;
   categories: Category[];
 }
 

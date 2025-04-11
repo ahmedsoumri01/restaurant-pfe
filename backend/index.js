@@ -20,7 +20,12 @@ const app = express();
 // Enable CORS for all requests
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "https://k8m7bj3t-3000.uks1.devtunnels.ms",
+      "https://k8m7bj3t-3001.uks1.devtunnels.ms",
+    ],
     credentials: true,
   })
 );
