@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const clientController = require("../controllers/client.controller");
-const { authMiddleware } = require("../middlewares/auth.middleware");
+const {
+  authMiddleware,
+  clientMiddleware,
+} = require("../middlewares/auth.middleware");
 const uploadMiddleware = require("../middlewares/upload.middleware");
 
 // 🔹 Get My Profile
@@ -11,6 +14,7 @@ router.get("/my-profile", authMiddleware, clientController.getMyProfile);
 router.put(
   "/update-profile",
   authMiddleware,
+  clientMiddleware,
   uploadMiddleware.uploadProfileImage, // Middleware to handle profile image upload
   clientController.updateClientProfile
 );
@@ -19,6 +23,7 @@ router.put(
 router.delete(
   "/delete-account",
   authMiddleware,
+  clientMiddleware,
   clientController.deleteMyAccount
 );
 
@@ -66,5 +71,25 @@ router.get(
   "/plats/restaurants",
   authMiddleware,
   clientController.getAllRestaurants
+);
+// 🔹 Get  Plat details
+
+router.get("/plats/:platId", authMiddleware, clientController.getPlatById);
+
+// 🔹 Make Comment
+router.post(
+  "/plats/:platId/comment",
+  authMiddleware,
+  clientController.makeComment
+);
+
+// 🔹 Like Plat
+router.put("/plats/:platId/like", authMiddleware, clientController.likePlat);
+
+// 🔹 Get All Comments on a Plat
+router.get(
+  "/plats/:platId/comments",
+  authMiddleware,
+  clientController.getAllCommentsOnPlat
 );
 module.exports = router;

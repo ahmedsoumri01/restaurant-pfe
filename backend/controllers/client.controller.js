@@ -275,3 +275,104 @@ exports.getAllRestaurants = async (req, res) => {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
+// 🔹 Get Plat by ID
+exports.getPlatById = async (req, res) => {
+  try {
+    const { platId } = req.params;
+    console.log("Fetching plat by ID...");
+    console.log(platId);
+    // Find the plat by ID
+    const plat = await Plat.findById(platId)
+      .populate("categorie")
+      .populate("restaurant");
+    console.log({ plat });
+    if (!plat) {
+      return res.status(404).json({ message: "Plat not found" });
+    }
+
+    res.json({ message: "Plat retrieved successfully", plat });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+// 🔹 Make Comment
+exports.makeComment = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { platId, texte } = req.body;
+
+    // Find the plat by ID
+    const plat = await Plat.findById(platId);
+    if (!plat) {
+      return res.status(404).json({ message: "Plat not found" });
+    }
+
+    // Add the comment to the plat's commentaires array
+    plat.commentaires.push({
+      utilisateur: userId,
+      texte,
+    });
+
+    await plat.save();
+
+    res.status(201).json({ message: "Comment added successfully", plat });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+// 🔹 Like Plat
+exports.likePlat = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { platId } = req.params;
+
+    // Find the plat by ID
+    const plat = await Plat.findById(platId);
+    if (!plat) {
+      return res.status(404).json({ message: "Plat not found" });
+    }
+
+    // Check if the user has already liked the plat
+    const isLiked = plat.likes.includes(userId);
+
+    if (isLiked) {
+      // Unlike the plat
+      plat.likes.pull(userId);
+      await plat.save();
+      return res.json({ message: "Plat unliked successfully", plat });
+    }
+
+    // Like the plat
+    plat.likes.push(userId);
+    await plat.save();
+
+    res.json({ message: "Plat liked successfully", plat });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+
+// 🔹 Get All Comments on a Plat
+exports.getAllCommentsOnPlat = async (req, res) => {
+  try {
+    const { platId } = req.params;
+
+    // Find the plat by ID and populate the commentaires field
+    const plat = await Plat.findById(platId).populate(
+      "commentaires.utilisateur"
+    );
+    if (!plat) {
+      return res.status(404).json({ message: "Plat not found" });
+    }
+
+    res.json({
+      message: "Comments retrieved successfully",
+      comments: plat.commentaires,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
