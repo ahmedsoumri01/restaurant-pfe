@@ -10,7 +10,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
-
+import useAuthStore from "@/store/useAuthStore";
 interface PlatActionsProps {
   plat: any;
   onLike: () => Promise<void>;
@@ -22,8 +22,9 @@ export default function PlatActions({
   onLike,
   isLiking,
 }: PlatActionsProps) {
+  const { user } = useAuthStore((state) => state);
   const [isLiked, setIsLiked] = useState(
-    plat.likes?.includes("current-user-id")
+    plat.likes?.includes(user?._id) || false
   );
   const [quantity, setQuantity] = useState(1);
 
@@ -50,7 +51,6 @@ export default function PlatActions({
   const handleAddToCart = () => {
     toast.success(`Added ${quantity} ${plat.nom} to cart`);
   };
-
   return (
     <div className="space-y-6 mt-6">
       <div className="flex items-center gap-2">
