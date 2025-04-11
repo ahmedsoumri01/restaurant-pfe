@@ -22,7 +22,7 @@ export default function Header({ toggleSidebar, isCollapsed }: HeaderProps) {
       <div className="flex items-center justify-between w-full">
         <div className="flex items-center">
           {/* Logo */}
-          <Link href={`/${user?.role}`} className="flex items-center mr-4">
+          <Link href={`/${user?.role}`} className="flex items-center">
             <Image
               src={logo}
               alt="Logo"

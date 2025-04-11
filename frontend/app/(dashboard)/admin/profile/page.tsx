@@ -57,7 +57,7 @@ export default function AdminProfile() {
 
         <Tabs defaultValue="account" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="account">Informations personnelles</TabsTrigger>
+            <TabsTrigger value="account">Informations</TabsTrigger>
             <TabsTrigger value="security">Sécurité</TabsTrigger>
           </TabsList>
 

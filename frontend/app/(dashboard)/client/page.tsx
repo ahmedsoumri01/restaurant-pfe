@@ -40,7 +40,7 @@ export default function AccueilPage() {
             <PopularDishesCarousel />
           </section> */}
         </div>
-        <div className="hidden 2xl:block">
+        <div className="hidden 2xl:block 2xl:mx-1">
           <CartSection />
         </div>
       </div>

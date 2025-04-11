@@ -5,7 +5,7 @@ type Props = {};
 
 export default function RestaiurantDashboard({}: Props) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-2">
       <h1 className="text-3xl font-bold">restaurant Dashboard</h1>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
