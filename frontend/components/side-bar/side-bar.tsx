@@ -58,7 +58,7 @@ export default function SideBar({
       <aside
         className={cn(
           "h-[calc(100vh-4rem)] bg-white border-r transition-all duration-300 fixed top-16 left-0 z-30",
-          isCollapsed ? "w-[70px]" : "w-[250px]"
+          isCollapsed ? "w-[65px]" : "w-[250px]"
         )}
       >
         <div className="flex flex-col h-full overflow-y-auto">

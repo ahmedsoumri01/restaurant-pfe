@@ -211,8 +211,12 @@ export default function CreatePlatForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
-          <TabsList className="grid grid-cols-3 mb-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="my-4 py-4"
+        >
+          <TabsList className="grid grid-cols-1 w-full mb-6 md:grid-cols-3 ">
             <TabsTrigger value="general">Informations générales</TabsTrigger>
             <TabsTrigger value="images">
               Images ({imageFiles.length})
@@ -224,7 +228,7 @@ export default function CreatePlatForm() {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-              <TabsContent value="general">
+              <TabsContent value="general" className="mt-8">
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Plat Name */}
@@ -362,7 +366,7 @@ export default function CreatePlatForm() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="images">
+              <TabsContent value="images" className="mt-8">
                 <div className="space-y-6">
                   {/* New Images Upload */}
                   <div>
@@ -431,7 +435,7 @@ export default function CreatePlatForm() {
                 </div>
               </TabsContent>
 
-              <TabsContent value="videos">
+              <TabsContent value="videos" className="mt-8">
                 <div className="space-y-6">
                   {/* New Videos Upload */}
                   <div>
