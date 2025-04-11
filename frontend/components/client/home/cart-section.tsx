@@ -14,19 +14,30 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { useCartStore } from "@/store/use-cart-store";
+import { useCartStore } from "@/store/useCartStore";
 import useClientStore from "@/store/useClientStore";
 /* import type { CartItem } from "@/stores/use-cart-store" */
 
 export default function CartSection() {
-  const { items, updateQuantity, getTotal, getServiceFee, getGrandTotal } =
-    useCartStore();
+  const {
+    items,
+    updateQuantity,
+    clearCart,
+    getTotal,
+    getServiceFee,
+    getGrandTotal,
+  } = useCartStore();
   const [address, setAddress] = useState("Elm Street, 23");
 
   const handleQuantityChange = (item: any, newQuantity: number) => {
     updateQuantity(item.id, newQuantity);
   };
-
+  const handleCheckout = () => {
+    alert(JSON.stringify(items, null, 2));
+  };
+  const handleClearCart = () => {
+    clearCart();
+  };
   return (
     <Card className="w-[420px] bg-[#fff2e7] border-[#fc8019] ">
       <CardHeader className="pb-3">
@@ -98,7 +109,10 @@ export default function CartSection() {
               <div key={item.id} className="flex gap-3">
                 <div className="w-16 h-16 relative rounded-md overflow-hidden border">
                   <Image
-                    src={item.image || `/placeholder.svg?height=64&width=64`}
+                    src={
+                      process.env.NEXT_PUBLIC_APP_URL + item.image ||
+                      `/placeholder.svg?height=64&width=64`
+                    }
                     alt={item.name}
                     fill
                     className="object-cover"
@@ -107,12 +121,13 @@ export default function CartSection() {
 
                 <div className="flex-1">
                   <h4 className="font-medium">{item.name}</h4>
+                  <p className="text-sm text-gray-500">{item.price} DT</p>
                   <p className="text-sm text-gray-500">x{item.quantity}</p>
                 </div>
 
                 <div className="flex flex-col items-end">
                   <span className="text-orange-500 font-bold">
-                    +${(item.price * item.quantity).toFixed(2)}
+                    +{(item.price * item.quantity).toFixed(2)} DT
                   </span>
 
                   <div className="flex items-center mt-1">
@@ -136,7 +151,7 @@ export default function CartSection() {
                           Number.parseInt(e.target.value) || 1
                         )
                       }
-                      className="h-7 w-10 px-1 mx-1 text-center"
+                      className="h-7 w-16 px-1 mx-0.5 text-center"
                     />
 
                     <Button
@@ -164,13 +179,13 @@ export default function CartSection() {
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Service</span>
-                <span>+${getServiceFee().toFixed(2)}</span>
+                <span>+{getServiceFee().toFixed(2)} DT</span>
               </div>
 
               <div className="flex justify-between font-bold text-lg">
                 <span>Total</span>
                 <span className="text-orange-500">
-                  ${getGrandTotal().toFixed(2)}
+                  +{getGrandTotal().toFixed(2)} DT
                 </span>
               </div>
             </div>
@@ -179,9 +194,18 @@ export default function CartSection() {
       </CardContent>
 
       {items.length > 0 && (
-        <CardFooter>
-          <Button className="w-full bg-orange-500 hover:bg-orange-600 h-12 text-lg">
+        <CardFooter className="flex flex-col gap-2">
+          <Button
+            className="w-full bg-orange-500 hover:bg-orange-600 h-12 text-lg"
+            onClick={handleCheckout}
+          >
             Checkout
+          </Button>
+          <Button
+            onClick={handleClearCart}
+            className="h-8 text-orange-500 border-orange-500 bg-transparent cursor-pointer hover:border-orange-500 hover:text-white transition-colors"
+          >
+            Clear Cart
           </Button>
         </CardFooter>
       )}

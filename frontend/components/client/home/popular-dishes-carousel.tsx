@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useCartStore } from "@/store/use-cart-store";
+import { useCartStore } from "@/store/useCartStore";
 import useClientStore from "@/store/useClientStore";
 import {
   Carousel,
@@ -91,6 +91,10 @@ export default function PopularDishesCarousel({
       const enhancedPlats = plats.slice(0, 10).map((plat, index) => ({
         ...plat,
         discount: discounts[index % discounts.length],
+        restaurant:
+          typeof plat.restaurant === "string"
+            ? { _id: plat.restaurant, nom: "Unknown" }
+            : plat.restaurant,
       }));
       setPopularDishes(enhancedPlats);
     }

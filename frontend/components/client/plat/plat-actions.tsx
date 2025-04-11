@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import useAuthStore from "@/store/useAuthStore";
+import { useCartStore, type CartItem } from "@/store/useCartStore";
+
 interface PlatActionsProps {
   plat: any;
   onLike: () => Promise<void>;
@@ -23,10 +25,15 @@ export default function PlatActions({
   isLiking,
 }: PlatActionsProps) {
   const { user } = useAuthStore((state) => state);
+  const { addItem, updateQuantity, items } = useCartStore();
   const [isLiked, setIsLiked] = useState(
     plat.likes?.includes(user?._id) || false
   );
   const [quantity, setQuantity] = useState(1);
+
+  // Check if item is already in cart
+  const existingCartItem = items.find((item) => item.id === plat._id);
+  const existingQuantity = existingCartItem?.quantity || 0;
 
   const handleLike = async () => {
     setIsLiked(!isLiked);
@@ -49,8 +56,30 @@ export default function PlatActions({
   };
 
   const handleAddToCart = () => {
-    toast.success(`Added ${quantity} ${plat.nom} to cart`);
+    const cartItem: CartItem = {
+      id: plat._id,
+      name: plat.nom,
+      price: plat.prix,
+      quantity: quantity,
+      image: plat.images[0] || "/placeholder.svg?height=100&width=100",
+    };
+
+    if (existingCartItem) {
+      // Update quantity if already in cart
+      updateQuantity(plat._id, existingQuantity + quantity);
+      toast.success(
+        `Updated ${plat.nom} quantity in cart (${existingQuantity + quantity})`
+      );
+    } else {
+      // Add new item to cart
+      addItem(cartItem);
+      toast.success(`Added ${quantity} ${plat.nom} to cart`);
+    }
+
+    // Reset quantity selector after adding to cart
+    setQuantity(1);
   };
+
   return (
     <div className="space-y-6 mt-6">
       <div className="flex items-center gap-2">
@@ -82,9 +111,16 @@ export default function PlatActions({
           onClick={handleAddToCart}
         >
           <ShoppingCart className="h-4 w-4" />
-          Add to Cart
+          {existingCartItem ? "Update Cart" : "Add to Cart"}
         </Button>
       </div>
+
+      {existingCartItem && (
+        <div className="text-sm text-gray-500">
+          Already in cart: {existingQuantity}{" "}
+          {existingQuantity > 1 ? "items" : "item"}
+        </div>
+      )}
 
       <div className="flex gap-2">
         <TooltipProvider>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useCartStore } from "@/store/use-cart-store";
+import { useCartStore } from "@/store/useCartStore";
 import useClientStore from "@/store/useClientStore";
 import PromotionCarousel from "@/components/client/home/promotion-carousel";
 import CategoriesCarousel from "@/components/client/home/categories-carousel";
