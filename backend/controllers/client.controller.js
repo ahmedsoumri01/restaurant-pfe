@@ -281,12 +281,12 @@ exports.getPlatById = async (req, res) => {
   try {
     const { platId } = req.params;
     console.log("Fetching plat by ID...");
-    console.log(platId);
+
     // Find the plat by ID
     const plat = await Plat.findById(platId)
       .populate("categorie")
       .populate("restaurant");
-    console.log({ plat });
+
     if (!plat) {
       return res.status(404).json({ message: "Plat not found" });
     }
@@ -301,7 +301,8 @@ exports.getPlatById = async (req, res) => {
 exports.makeComment = async (req, res) => {
   try {
     const userId = req.user.id;
-    const { platId, texte } = req.body;
+    const { platId, comment } = req.body;
+    console.log("Making comment...");
 
     // Find the plat by ID
     const plat = await Plat.findById(platId);
@@ -312,7 +313,7 @@ exports.makeComment = async (req, res) => {
     // Add the comment to the plat's commentaires array
     plat.commentaires.push({
       utilisateur: userId,
-      texte,
+      texte: comment,
     });
 
     await plat.save();
@@ -328,7 +329,8 @@ exports.likePlat = async (req, res) => {
   try {
     const userId = req.user.id;
     const { platId } = req.params;
-
+    console.log("Liking plat...");
+    console.log({ userId, platId });
     // Find the plat by ID
     const plat = await Plat.findById(platId);
     if (!plat) {
@@ -359,7 +361,13 @@ exports.likePlat = async (req, res) => {
 exports.getAllCommentsOnPlat = async (req, res) => {
   try {
     const { platId } = req.params;
-
+    console.log("Fetching all comments on plat...");
+    console.log({
+      body: req.body,
+      platId,
+      userId: req.user.id,
+      user: req.user,
+    });
     // Find the plat by ID and populate the commentaires field
     const plat = await Plat.findById(platId).populate(
       "commentaires.utilisateur"
