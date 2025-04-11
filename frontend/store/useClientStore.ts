@@ -60,6 +60,18 @@ interface Categorie {
   updatedAt: string;
 }
 
+// Define Comment interface
+interface Comment {
+  utilisateur: {
+    _id: string;
+    nom?: string;
+    prenom?: string;
+    photoProfil?: string;
+  };
+  texte: string;
+  date: string;
+}
+
 // Define Plat interface
 interface Plat {
   _id: string;
@@ -72,6 +84,9 @@ interface Plat {
   categorie: Categorie;
   restaurant: string | Restaurant;
   disponible: boolean;
+  likes: string[];
+  commentaires: Comment[];
+  comments?: Comment[]; // Add comments property to match the usage
   createdAt: string;
   updatedAt: string;
 }
@@ -144,6 +159,12 @@ interface ClientState {
   getAllCategories: () => Promise<Categorie[]>;
   getAllRestaurants: () => Promise<Restaurant[]>;
   getPlatById: (platId: string) => Promise<Plat | null>;
+
+  // Comment and Like Actions
+  makeComment: (platId: string, comment: string) => Promise<Plat | null>;
+  likePlat: (platId: string) => Promise<Plat | null>;
+  getAllCommentsOnPlat: (platId: string) => Promise<Comment[] | null>;
+
   // Utility Actions
   clearError: () => void;
 }
@@ -152,8 +173,10 @@ const useClientStore = create<ClientState>()(
   devtools((set, get) => ({
     clientProfile: null,
     avis: [],
+
     categories: [],
     plats: [],
+    plat: null,
     restaurants: [],
     isLoading: false,
     error: null,
@@ -422,6 +445,7 @@ const useClientStore = create<ClientState>()(
         return [];
       }
     },
+
     //getAllCategories
     getAllCategories: async () => {
       set({ isLoading: true, error: null });
@@ -445,6 +469,7 @@ const useClientStore = create<ClientState>()(
         return [];
       }
     },
+
     //getAllRestaurants
     getAllRestaurants: async () => {
       set({ isLoading: true, error: null });
@@ -468,6 +493,7 @@ const useClientStore = create<ClientState>()(
         return [];
       }
     },
+
     //getPlatById
     getPlatById: async (platId: string) => {
       set({ isLoading: true, error: null });
@@ -499,6 +525,7 @@ const useClientStore = create<ClientState>()(
       try {
         const response = await api.post(`/client/plats/${platId}/comment`, {
           comment,
+          platId,
         });
         const { plat } = response.data;
 
@@ -507,22 +534,24 @@ const useClientStore = create<ClientState>()(
           isLoading: false,
         });
 
+        toast.success("Comment added successfully");
         return plat;
       } catch (error) {
         const axiosError = error as AxiosError<{ message: string }>;
         const errorMessage =
-          axiosError.response?.data?.message || "Failed to fetch plat";
+          axiosError.response?.data?.message || "Failed to add comment";
 
         set({ error: errorMessage, isLoading: false });
         toast.error(errorMessage);
         return null;
       }
     },
+
     //likePlat
     likePlat: async (platId: string) => {
       set({ isLoading: true, error: null });
       try {
-        const response = await api.post(`/client/plats/${platId}/like`);
+        const response = await api.put(`/client/plats/${platId}/like`);
         const { plat } = response.data;
 
         set({
@@ -530,11 +559,12 @@ const useClientStore = create<ClientState>()(
           isLoading: false,
         });
 
+        toast.success("Dish liked successfully");
         return plat;
       } catch (error) {
         const axiosError = error as AxiosError<{ message: string }>;
         const errorMessage =
-          axiosError.response?.data?.message || "Failed to fetch plat";
+          axiosError.response?.data?.message || "Failed to like dish";
 
         set({ error: errorMessage, isLoading: false });
         toast.error(errorMessage);
@@ -550,7 +580,7 @@ const useClientStore = create<ClientState>()(
         const { comments } = response.data;
 
         set({
-          plat: { ...get().plat, comments },
+          plat: get().plat ? ({ ...get().plat, comments } as Plat) : null,
           isLoading: false,
         });
 
@@ -558,16 +588,18 @@ const useClientStore = create<ClientState>()(
       } catch (error) {
         const axiosError = error as AxiosError<{ message: string }>;
         const errorMessage =
-          axiosError.response?.data?.message || "Failed to fetch plat";
+          axiosError.response?.data?.message || "Failed to fetch comments";
 
         set({ error: errorMessage, isLoading: false });
         toast.error(errorMessage);
         return null;
       }
     },
+
     // Clear error
     clearError: () => set({ error: null }),
   }))
 );
 
 export default useClientStore;
+export { useClientStore };
